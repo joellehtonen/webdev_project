@@ -34,10 +34,10 @@ app.post('/login', async (req, res) => {
 	}
 })
 
-app.get('/user', (req, res) => {
+app.get('/user', async (req, res) => {
 	try {
 		const result = await pool.query(`
-			SELECT 
+			SELECT users
 			`)
 	}
 	catch (err) {
