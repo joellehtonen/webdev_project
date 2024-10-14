@@ -6,5 +6,6 @@ CREATE TABLE users (
 
 CREATE TABLE likes (
 	id SERIAL PRIMARY KEY,
-
+	user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+	pokemon_id INTEGER
 )
