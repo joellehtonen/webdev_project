@@ -13,6 +13,7 @@ const pool = new Pool ({
 })
 
 app.post('/register', async (req, res) => {
+	const { username, password } = req.body;
 	try {
 
 	}
@@ -71,8 +72,12 @@ app.post('/users', async (req, res) => {
 			INSERT INTO users (username) VALUE ($1) RETURNING *`, [username]
 		)
 	}
-	res.status(201).json(result.rows[0])
-}
+	catch (err) {
+		console.log(err);
+		res.status(500).json({ error: 'interal server error' });
+	}
+	res.status(201).json(result.rows[0]);
+});
 
 // delete a user
 app.delete('/users/:id', async (req, res) => {
@@ -94,5 +99,5 @@ app.delete('/users/:id', async (req, res) => {
 app.use(express.json());
 
 app.listen(port, () => {
-	console.log('Server running on http://localhost:${port}')
+	console.log(`Server running on http://localhost:${port}`)
 })
