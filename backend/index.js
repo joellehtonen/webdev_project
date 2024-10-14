@@ -94,7 +94,7 @@ app.get('/users/:usersId/likes', async (req, res) => {
 })
 
 // add a like to an user
-app.post('/likes/userId:', async (req, res) => {
+app.post('/likes/usersId:', async (req, res) => {
 	const {userId} = req.params;
 	const {pokemonId} = req.body;
 	if (!pokemonId)
@@ -111,10 +111,10 @@ app.post('/likes/userId:', async (req, res) => {
 })
 
 // delete a like from an user
-app.delete('/likes/userId:', async (req, res) => {
+app.delete('/likes/:usersId', async (req, res) => {
 	try {
 		const result = await pool.query (`
-			DELETE FROM likes WHERE likes_id == $1`, [likesId])
+			DELETE FROM likes WHERE likesId = $1`, [likesId])
 		res.json(({message: "Like removed"}))
 		}
 		catch (err) {
