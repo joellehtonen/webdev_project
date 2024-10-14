@@ -1,6 +1,6 @@
 const express = require('express');
 const { Pool } = require('pg');
-const http = require('http');
+// const http = require('http');
 const app = express();
 const port = 3000;
 
@@ -63,6 +63,17 @@ app.get('/users/:id', async (req, res) => {
 	}
 })
 
+// create a new user
+app.post('/users', async (req, res) => {
+	const {username} = req.body
+	try {
+		const result = await pool.query(`
+			INSERT INTO users (username) VALUE ($1) RETURNING *`, [username]
+		)
+	}
+	res.status(201).json(result.rows[0])
+}
+
 // delete a user
 app.delete('/users/:id', async (req, res) => {
 	const {id} = req.params;
@@ -71,8 +82,12 @@ app.delete('/users/:id', async (req, res) => {
 			DELETE FROM users WHERE id = $1 RETURNING *`, [id]);
 		if (result.rows.length === 0) {
 			return res.status(404).json ({error: 'User not found'});
-		res.json(({message: 'User deleted successfully'}))
 		}
+		res.json({message: 'User deleted successfully'})
+	}
+	catch (err) {
+		console.error(err);
+		res.status(500).json({error: "Internal server error"})
 	}
 })
 
