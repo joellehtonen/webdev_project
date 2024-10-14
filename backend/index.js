@@ -104,11 +104,11 @@ app.delete('/users/:id', async (req, res) => {
 
 // get all likes from an user
 app.get('/users/:usersId/likes', async (req, res) => {
-	const {userId} = req.params;
+	const {usersId} = req.params;
 	try {
 		const result = await pool.query(`
 			SELECT likes.* FROM likes
-			WHERE likes.user_id = $1`, [userId]
+			WHERE likes.users_id = $1`, [userId]
 		)
 		if (result.rows.length === 0) {
 			return res.status(404).json({error: 'User not found'});
@@ -122,14 +122,14 @@ app.get('/users/:usersId/likes', async (req, res) => {
 })
 
 // add a like to an user
-app.post('/likes/usersId:', async (req, res) => {
+app.post('/likes/:usersId', async (req, res) => {
 	const {userId} = req.params;
 	const {pokemonId} = req.body;
 	if (!pokemonId)
 			return res.status(400).json({error: "pokemonId required"});
 	try {
 		await pool.query(`
-			INSERT INTO likes (userId, pokemonId) VALUES ($1, $2)`, [userId, pokemonId]);
+			INSERT INTO likes (user_id, pokemon_id) VALUES ($1, $2)`, [userId, pokemonId]);
 	res.status(201).json({message: "Pokemon liked"});
 	}
 	catch (err) {
