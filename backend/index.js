@@ -114,7 +114,7 @@ app.post('/likes/:usersId', async (req, res) => {
 app.delete('/likes/:usersId', async (req, res) => {
 	try {
 		const result = await pool.query (`
-			DELETE FROM likes WHERE likesId = $1`, [likesId])
+			DELETE FROM likes WHERE likes_id = $1`, [likesId])
 		res.json(({message: "Like removed"}))
 		}
 		catch (err) {
