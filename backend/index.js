@@ -13,7 +13,10 @@ app.use('/', authRoutes);
 // get all users
 app.get('/users', async (req, res) => {
 	try {
-		const result = await pool.query('SELECT id, username FROM users')
+		const result = await pool.query(`
+			SELECT users.*
+			GROUP BY users.id;
+			`)
 		res.json(result.rows)
 	}
 	catch (err) {
@@ -71,55 +74,8 @@ app.delete('/users/:id', async (req, res) => {
 	}
 })
 
-// get all likes from an user
-app.get('/users/:usersId/likes', async (req, res) => {
-	const {usersId} = req.params;
-	try {
-		const result = await pool.query(`
-			SELECT likes.* FROM likes
-			WHERE likes.users_id = $1`, [userId]
-		)
-		if (result.rows.length === 0) {
-			return res.status(404).json({error: 'User not found'});
-		}
-		res.json(result.rows);
-	}
-	catch (err) {
-		console.error(err);
-		res.status(500).json({error: "Internal server error"})
-	}
-})
-
-// add a like to an user
-app.post('/likes/:usersId', async (req, res) => {
-	const {userId} = req.params;
-	const {pokemonId} = req.body;
-	if (!pokemonId)
-			return res.status(400).json({error: "pokemonId required"});
-	try {
-		await pool.query(`
-			INSERT INTO likes (user_id, pokemon_id) VALUES ($1, $2)`, [userId, pokemonId]);
-	res.status(201).json({message: "Pokemon liked"});
-	}
-	catch (err) {
-		console.error(err);
-		res.status(500).json({error: "Internal server error"})
-	}
-})
-
-// delete a like from an user
-app.delete('/likes/:usersId', async (req, res) => {
-	try {
-		const result = await pool.query (`
-			DELETE FROM likes WHERE likesId = $1`, [likesId])
-		res.json(({message: "Like removed"}))
-		}
-		catch (err) {
-			console.error(err);
-			res.status(500).json({error: "Internal server error"})
-		}
-})
+app.use(express.json());
 
 app.listen(port, () => {
-	console.log(`Server running on http://localhost:${port}`)
+	console.log('Server running on http://localhost:${port}')
 })
