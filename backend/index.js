@@ -1,6 +1,7 @@
 const express = require('express');
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 // const http = require('http');
 const app = express();
 const port = 3000;
@@ -19,9 +20,12 @@ app.use(express.json());
 app.post('/register', async (req, res) => {
 	const { username, password } = req.body;
 	try {
+		const count_result = await pool.query('SELECT username FROM users WHERE username = ($1)', [username]);
+		if (count_result.rows.length !== 0) { 
+			return res.status(400).json({ error: 'User already exists' })
+		}
 		const hashedPassword = await bcrypt.hash(password, 10);
-		console.log('hash' + hashedPassword);
-		const result = await pool.query('INSERT INTO users (username, hashed_password) VALUES ($1, $2) RETURNING username;',
+		const result = await pool.query('INSERT INTO users (username, hashed_password) VALUES ($1, $2) RETURNING id, username;',
 		[username, hashedPassword]);
 		res.json(result.rows);
 	}
@@ -32,8 +36,17 @@ app.post('/register', async (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
+	const { username, password } = req.body;
 	try {
-
+		const result = await pool.query('SELECT id, username, hashed_password FROM users WHERE username = ($1)', [username]);
+		if (result.rows.length === 0) { 
+			return res.status(400).json({ error: 'Invalid credentials' })
+		}
+		if (await bcrypt.compare(password, result.rows[0].hashed_password) === false) {
+			return res.status(400).json({ error: 'Invalid credentials' })
+		}
+		const token = jwt.sign({ id: result.rows[0].id}, 'secret_encryption_key', { expiresIn: '1h' })
+		res.json({ auth_token: token });
 	}
 	catch (err) {
 		console.error(err);
