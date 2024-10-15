@@ -20,6 +20,22 @@ const router = express.Router();
 
 const JWT_SECRET = "real-secure-key";
 
+
+const authMiddleware = (req, res, next) => {
+	const token = req.get('authorization').replace('Bearer ', '');
+	if (!token)
+		return (res.status(401).json({error: 'Access denied'}));
+	try {
+		const decoded = jwt.decode(token, JWT_SECRET);
+		const authorized = jwt.verify(token, JWT_SECRET);
+		req.user = authorized;
+		next();
+	}
+	catch (err) {
+		return (res.status(401).json({error: 'Invalid token'}));
+	}
+}
+
 router.post('/register', async (req, res) => {
 	const { username, password } = req.body;
 	try {
@@ -58,3 +74,4 @@ router.post('/login', async (req, res) => {
 })
 
 module.exports = router;
+exports.authMiddleware = authMiddleware;

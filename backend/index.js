@@ -17,8 +17,8 @@ app.use('/likes', likesRoutes);
 app.get('/users', async (req, res) => {
 	try {
 		const result = await pool.query(`
-			SELECT users.*
-			GROUP BY users.id;
+			SELECT id, username
+			FROM users
 			`)
 		res.json(result.rows)
 	}
@@ -32,7 +32,7 @@ app.get('/users', async (req, res) => {
 app.get('/users/:id', async (req, res) => {
 	const {id} = req.params;
 	try {
-		const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
+		const result = await pool.query(`SELECT id, username FROM users WHERE id = $1`, [id]);
 		if (result.rows.length === 0) {
 			return res.status(404).json({error: 'User not found'});
 		}
