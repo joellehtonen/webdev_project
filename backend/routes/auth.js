@@ -1,14 +1,14 @@
-// ************************************************************************** //
-//                                                                            //
-//                                                        :::      ::::::::   //
-//   auth.js                                            :+:      :+:    :+:   //
-//                                                    +:+ +:+         +:+     //
-//   By: pleander <pleander@student.hive.fi>        +#+  +:+       +#+        //
-//                                                +#+#+#+#+#+   +#+           //
-//   Created: 2024/10/15 11:31:12 by pleander          #+#    #+#             //
-//   Updated: 2024/10/15 13:23:13 by pleander         ###   ########.fr       //
-//                                                                            //
-// ************************************************************************** //
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   auth.js                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jlehtone <jlehtone@student.hive.fi>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/15 11:31:12 by pleander          #+#    #+#             */
+/*   Updated: 2024/10/15 16:37:06 by jlehtone         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 const express = require('express');
 const { Pool } = require('pg');
@@ -19,7 +19,6 @@ const { pool } = require('../db');
 const router = express.Router();
 
 const JWT_SECRET = "real-secure-key";
-
 
 const authMiddleware = (req, res, next) => {
 	const token = req.get('authorization').replace('Bearer ', '');
