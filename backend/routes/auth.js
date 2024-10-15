@@ -72,5 +72,4 @@ router.post('/login', async (req, res) => {
 	}
 })
 
-module.exports = router;
-exports.authMiddleware = authMiddleware;
+module.exports = { router, authMiddleware };

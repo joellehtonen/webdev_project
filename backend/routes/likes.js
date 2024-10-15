@@ -3,24 +3,9 @@ const express = require('express');
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
 const { pool } = require('../db');
-//const authMiddleware = require('./auth')
+const { router: authRoutes, authMiddleware } = require('./auth');
 
 const router = express.Router();
-
-const authMiddleware = (req, res, next) => {
-	const token = req.get('authorization').replace('Bearer ', '');
-	if (!token)
-		return (res.status(401).json({error: 'Access denied'}));
-	try {
-		const decoded = jwt.decode(token, "real-secure-key");
-		const authorized = jwt.verify(token, "real-secure-key");
-		req.user = authorized;
-		next();
-	}
-	catch (err) {
-		return (res.status(401).json({error: 'Invalid token'}));
-	}
-}
 
 // get all likes from an user
 router.get('/user/:userId', async (req, res) => {
