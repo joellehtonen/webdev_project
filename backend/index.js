@@ -111,7 +111,8 @@ app.post('/likes/:usersId', async (req, res) => {
 })
 
 // delete a like from an user
-app.delete('/likes/:usersId', async (req, res) => {
+app.delete('/likes/:usersId/:likesId', async (req, res) => {
+	const {userId, likeId} = req.params;
 	try {
 		const result = await pool.query (`
 			DELETE FROM likes WHERE likes_id = $1`, [likesId])
@@ -122,6 +123,9 @@ app.delete('/likes/:usersId', async (req, res) => {
 			res.status(500).json({error: "Internal server error"})
 		}
 })
+
+
+app.get()
 
 app.listen(port, () => {
 	console.log('Server running on http://localhost:${port}')
