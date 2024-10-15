@@ -1,21 +1,14 @@
 const express = require('express');
 const authRoutes = require('./routes/auth');
 const { pool } = require('./db');
-//const { Pool } = require('pg');
 // const http = require('http');
+
 const app = express();
 const port = 3000;
 
-// const pool = new Pool ({
-// 	user: 'youruser',
-// 	host: 'localhost',
-// 	database: 'pokemon-db',
-// 	password: 'yourpassword',
-// 	port: 5432
-// })
 
 app.use(express.json());
-app.use('/auth', authRoutes);
+app.use('/', authRoutes);
 
 // get all users
 app.get('/users', async (req, res) => {
