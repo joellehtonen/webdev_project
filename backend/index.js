@@ -1,14 +1,15 @@
 const express = require('express');
+// const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const pokeRoutes = require('./routes/pokemon');
 const likesRoutes = require('./routes/likes')
 const { pool } = require('./db');
-// const http = require('http');
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+// app.use(cors());
 app.use('/auth', authRoutes);
 app.use('/pokemon', pokeRoutes);
 app.use('/likes', likesRoutes);
