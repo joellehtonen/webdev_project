@@ -1,5 +1,5 @@
-import express from 'express';
-import axios from 'axios';
+const express = require('express');
+const axios = require('axios');
 
 const router = express.Router();
 const POKEAPI_URL = 'https://pokeapi.co/api/v2/';
@@ -8,7 +8,7 @@ const isValidInput = (input) => {
 	return typeof input === 'string' && /^[a-zA-Z]+$/.test(input);
 };
 
-router.get('/pokemon/:name', async (req, res) => {
+router.get('/:name', async (req, res) => {
 	const {name} = req.params;
 	if (!isValidInput(name)) {
 		return res.status(400).json({error: 'Invalid input provided'})
@@ -38,4 +38,4 @@ router.get('/type/:type', async (req, res) => {
 	}
 })
 
-export default router;
+module.exports = router;
