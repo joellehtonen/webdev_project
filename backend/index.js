@@ -1,5 +1,5 @@
 const express = require('express');
-const authRoutes = require('./routes/auth');
+const { router: authRoutes, authMiddleware} = require('./routes/auth');
 const pokeRoutes = require('./routes/pokemon');
 const likesRoutes = require('./routes/likes')
 const { pool } = require('./db');
