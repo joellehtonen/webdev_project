@@ -31,6 +31,7 @@ export default App;*/
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'; // Import Link here
 import PokemonList from './pokemonList'; // Adjust the import path as necessary
+import RegisterForm from './registerForm';
 
 function App() {
   return (
@@ -39,6 +40,9 @@ function App() {
         <h1>
           <Link to="/">Pokemon Finder</Link>
         </h1>
+        <div>
+          <RegisterForm />
+        </div>
         <nav>
           <Link to="/pokemons">View Pokémon List</Link>
         </nav>
