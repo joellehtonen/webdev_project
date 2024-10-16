@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   auth.js                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlehtone <jlehtone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: mpellegr <mpellegr@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/15 11:31:12 by pleander          #+#    #+#             */
-/*   Updated: 2024/10/15 16:37:06 by jlehtone         ###   ########.fr       */
+/*   Updated: 2024/10/16 14:25:25 by mpellegr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ const authMiddleware = (req, res, next) => {
 }
 
 router.post('/register', async (req, res) => {
+	console.log(req.body);
 	const { username, password } = req.body;
 	try {
 		const count_result = await pool.query('SELECT username FROM users WHERE username = ($1)', [username]);

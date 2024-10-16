@@ -20,7 +20,7 @@ const isValidInput = (input) => {
 };
 
 //WORK IN PROGRESS
-router.get('/pokemon/:name', async (req, res) => {
+router.get('/', async (req, res) => {
 	const {name, type} = req.query;
 	if (name && !isValidInput(name)) {
 		return res.status(400).json({error: 'Invalid input provided'})

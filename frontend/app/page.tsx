@@ -1,7 +1,9 @@
 import Image from "next/image";
 import { PokemonGrid } from "@/components/pokemon-grid";
 import { getPokemonList } from "@/lib/pokemonAPI";
-import { useEffect } from "react";
+import RegisterForm from "@/components/register-form";
+import LoginForm from "@/components/login-form";
+import Link from 'next/link';
 
 //const PER_PAGE = 50
 
@@ -28,11 +30,32 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
       <header>
       </header>
       <main>
+
+      <div className="container mx-auto mt-10">
+          <RegisterForm />
+      </div>
+
+      <div>
+          <Link href="/login">
+            <button>Login</button>
+          </Link>
+      </div>
+
       <PokemonGrid
-          pokemonList={/*paginatedP*/pokemonList}
+          pokemonList={pokemonList}
           currentPage={page}
-  //        totalPages={totalPages}
-      /> {/* Pass the paginated list and pagination info */}
+      />
+
+      <div className="container mx-auto mt-10">
+          <RegisterForm />
+      </div>
+
+      <div>
+          <Link href="/login">
+            <button>Login</button>
+          </Link>
+      </div>
+
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
