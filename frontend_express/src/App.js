@@ -33,6 +33,7 @@ import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate 
 import PokemonList from './pokemonList'; // Adjust the import path as necessary
 import RegisterForm from './registerForm';//
 import LoginPage from './loginForm';
+import PokemonPage from './pokemonPage';
 //import IsTokenExpired from './handleTokenExpired';
 
 function App() {
@@ -77,7 +78,6 @@ const handleLogout = () => {
             <Link to="/login">Login</Link>
           </nav>
         )}
-        
 
         {/* Define the routes for Login and Pokemon List */}
         <Routes>
@@ -98,6 +98,10 @@ const handleLogout = () => {
 
       <Routes>
         <Route path="/pokemon" element={<PokemonList />} />
+        <Route
+          path="/pokemon/:name"
+          element={<PokemonPage />}
+          />
       </Routes>
     </div>
   );
