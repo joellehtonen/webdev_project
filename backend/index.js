@@ -16,15 +16,17 @@ app.use('/pokemon', pokeRoutes);
 app.use('/likes', likesRoutes);
 
 //added this only for testing without next.js
-app.get('/api/pokemon', async (req, res) => {
-    try {
-        const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0');
-        res.json(response.data);
-    } catch (error) {
-        console.error('Error fetching data from PokeAPI:', error);
-        res.status(500).json({ error: 'Failed to fetch data' });
-    }
-});
+// app.get('/api/pokemon', async (req, res) => {
+//     try {
+//         const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0');
+//         res.json(response.data);
+//     } catch (error) {
+//         console.error('Error fetching data from PokeAPI:', error);
+//         res.status(500).json({ error: 'Failed to fetch data' });
+//     }
+// });
+
+app.use('/api/pokemon', pokeRoutes);
 
 // get all users
 app.get('/users', async (req, res) => {
