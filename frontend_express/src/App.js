@@ -33,20 +33,26 @@ import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate 
 import PokemonList from './pokemonList'; // Adjust the import path as necessary
 import RegisterForm from './registerForm';//
 import LoginPage from './loginForm';
+import UserPage from './userPage';
 //import IsTokenExpired from './handleTokenExpired';
+//import userPage from './userPage';
 
 function App() {
   const location = useLocation(); // Get the current route
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     // Check login status in localStorage
     const token = localStorage.getItem('authToken'); // Check for token presence instead of 'isLoggedIn'
+    const userName = localStorage.getItem('userName');
     if (token/* && !IsTokenExpired(token)*/) {
       setIsLoggedIn(!!token); // Set isLoggedIn based on token presence
+      setUserName(userName);
     } else {
       localStorage.removeItem('authToken');
+      localStorage.removeItem('userName');
       setIsLoggedIn(false);
     }
 }, [location]); // Re-run effect when location (route) changes
@@ -54,6 +60,7 @@ function App() {
 const handleLogout = () => {
     // Clear the login state and token
     localStorage.removeItem('authToken');
+    localStorage.removeItem('userName');
     setIsLoggedIn(false);
     navigate('/login'); // Redirect to login after logout
 };
@@ -63,6 +70,12 @@ const handleLogout = () => {
       <h1>
         <Link to="/">Pokemon Finder</Link>
       </h1>
+
+      {isLoggedIn && (
+        <nav>
+          <Link to="/user">{userName}</Link>
+        </nav>
+      )}
 
       {/* Conditionally render RegisterForm if not on the /login route */}
       {!isLoggedIn && location.pathname !== '/login' && (
@@ -79,9 +92,10 @@ const handleLogout = () => {
         )}
         
 
-        {/* Define the routes for Login and Pokemon List */}
+        {/* Define the routes for Login, UserPage and Pokemon List */}
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/user/:username" element={<UserPage/>} />
         </Routes>
       </div>
 
