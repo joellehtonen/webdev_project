@@ -20,7 +20,8 @@ const isValidInput = (input) => {
 };
 
 router.get('/', async (req, res) => {
-	const {name, type} = req.body;
+	const {name, type} = req.query;
+	console.log(name)
 	if (name && !isValidInput(name)) {
 		return res.status(400).json({error: 'Invalid input provided'})
 	}
@@ -39,8 +40,8 @@ router.get('/', async (req, res) => {
 					return res.status(404).json({message: 'No Pokemon found of that name and type'});
 		}
 		else if (name) {
-			const nameResponse = await axios.get(`${POKEAPI_URL}/pokemon/${name}`);
-			response = nameResponse.data.results.filter(p => p.name.includes(name));
+			//const nameResponse = await axios.get(`${POKEAPI_URL}pokemon/${name}`);
+			response = await axios.get(`${POKEAPI_URL}pokemon/${name}`)//nameResponse.data//.results.filter(p => p.name.includes(name));
 		}
 		else if (type) {
 			const typeResponse = await axios.get(`${POKEAPI_URL}/type/${type}`);

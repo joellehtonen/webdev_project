@@ -34,6 +34,7 @@ import PokemonList from './pokemonList'; // Adjust the import path as necessary
 import RegisterForm from './registerForm';//
 import LoginPage from './loginForm';
 import UserPage from './userPage';
+import PokemonPage from './pokemonPage';
 //import IsTokenExpired from './handleTokenExpired';
 //import userPage from './userPage';
 
@@ -90,9 +91,8 @@ const handleLogout = () => {
             <Link to="/login">Login</Link>
           </nav>
         )}
-        
 
-        {/* Define the routes for Login, UserPage and Pokemon List */}
+        {/* Define the routes for Login and Pokemon List */}
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/user/:username" element={<UserPage/>} />
@@ -112,6 +112,10 @@ const handleLogout = () => {
 
       <Routes>
         <Route path="/pokemon" element={<PokemonList />} />
+        <Route
+          path="/pokemon/:name"
+          element={<PokemonPage />}
+          />
       </Routes>
     </div>
   );
