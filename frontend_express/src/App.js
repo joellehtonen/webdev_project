@@ -28,30 +28,87 @@ export default App;*/
 
 // src/App.js
 
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'; // Import Link here
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom'; // Import Link here
 import PokemonList from './pokemonList'; // Adjust the import path as necessary
-import RegisterForm from './registerForm';
+import RegisterForm from './registerForm';//
+import LoginPage from './loginForm';
+//import IsTokenExpired from './handleTokenExpired';
 
 function App() {
+  const location = useLocation(); // Get the current route
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check login status in localStorage
+    const token = localStorage.getItem('authToken'); // Check for token presence instead of 'isLoggedIn'
+    if (token/* && !IsTokenExpired(token)*/) {
+      setIsLoggedIn(!!token); // Set isLoggedIn based on token presence
+    } else {
+      localStorage.removeItem('authToken');
+      setIsLoggedIn(false);
+    }
+}, [location]); // Re-run effect when location (route) changes
+
+const handleLogout = () => {
+    // Clear the login state and token
+    localStorage.removeItem('authToken');
+    setIsLoggedIn(false);
+    navigate('/login'); // Redirect to login after logout
+};
+
   return (
-    <Router>
-      <div>
-        <h1>
-          <Link to="/">Pokemon Finder</Link>
-        </h1>
+    <div>
+      <h1>
+        <Link to="/">Pokemon Finder</Link>
+      </h1>
+
+      {/* Conditionally render RegisterForm if not on the /login route */}
+      {!isLoggedIn && location.pathname !== '/login' && (
         <div>
           <RegisterForm />
         </div>
-        <nav>
-          <Link to="/pokemons">View Pokémon List</Link>
-        </nav>
+      )}
+
+      <div>
+        {!isLoggedIn && (
+          <nav>
+            <Link to="/login">Login</Link>
+          </nav>
+        )}
+        
+
+        {/* Define the routes for Login and Pokemon List */}
         <Routes>
-          <Route path="/pokemons" element={<PokemonList />} />
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </div>
+
+      {/* Show Logout button if logged in */}
+      {isLoggedIn && (
+          <div>
+              <button onClick={handleLogout}>Logout</button>
+          </div>
+      )}
+
+      <nav>
+        <Link to="/pokemon">View Pokémon List</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/pokemon" element={<PokemonList />} />
+      </Routes>
+    </div>
+  );
+}
+
+function AppWrapper() {
+  return (
+    <Router>
+      <App />
     </Router>
   );
 }
 
-export default App;
+export default AppWrapper;

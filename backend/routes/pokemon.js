@@ -20,20 +20,20 @@ const isValidInput = (input) => {
 };
 
 router.get('/', async (req, res) => {
-	const {name, type} = req.query;
+	const {name, type} = req.body;
 	if (name && !isValidInput(name)) {
 		return res.status(400).json({error: 'Invalid input provided'})
 	}
 
-	const cachedData = cache.get(name);
+/*	const cachedData = cache.get(name);
 	if (cachedData) {
 		return res.json(cachedData);
-	}
+	}*/
 	try {
 		let response;
 
 		if (name && type) {
-			const typeResponse = await axios.get(`${POKEAPI_URL}/type/${type}`);
+			const typeResponse = await axios.get(`${POKEAPI_URL}type/${type}`);
 			response = typeResponse.data.pokemon.filter(p => p.pokemon.name.includes(name));
 			if (response.length === 0)
 					return res.status(404).json({message: 'No Pokemon found of that name and type'});
@@ -47,10 +47,10 @@ router.get('/', async (req, res) => {
 			response = typeResponse.data.pokemon.map(p => p.pokemon);
 		}
 		else {
-			response = await axios.get(`${POKEAPI_URL}/pokemon?limit=1305`);
+			response = await axios.get(`${POKEAPI_URL}pokemon?limit=1305`);
 		}
-		cache.set(name, response.data);
-		manageCacheSize();
+/*		cache.set(name, response.data);
+		manageCacheSize();*/
 		res.json(response.data);
 	}
 	catch (err) {

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './pokemonList.css';
+import { Link } from 'react-router-dom';
 
 const PokemonList = () => {
     const [pokemon, setPokemon] = useState([]);
@@ -11,7 +12,7 @@ const PokemonList = () => {
     useEffect(() => {
         const fetchPokemon = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/pokemon');
+                const response = await axios.get('http://localhost:5000/pokemon');
                 setPokemon(response.data.results); // Access the results array
                 setLoading(false);
             } catch (err) {
@@ -32,7 +33,9 @@ const PokemonList = () => {
             <div className="pokemon-grid">
                 {pokemon.map((poke) => (
                     <div className="pokemon-card" key={poke.name}>
+                        <Link to ={`/pokemon/${poke.name}`}>
                        <h3>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3> {/* Capitalize the first letter */}
+                       </Link>
                   </div>
                 ))}
             </div>

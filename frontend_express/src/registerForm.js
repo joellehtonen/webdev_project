@@ -18,12 +18,10 @@ const RegisterForm = () => {
         password
       });
 
-      if (response.status === 201) {
-        setSuccess("Registration successful!"); // Show success message
-        setUsername(""); // Clear username input
-        setPassword(""); // Clear password input
-        setError(""); // Clear any previous errors
-      }
+      setSuccess("Registration successful!"); // Show success message
+      setUsername(""); // Clear username input
+      setPassword(""); // Clear password input
+      setError(""); // Clear any previous errors
     } catch (err) {
       setError("Registration failed. Please try again."); // Show error message
       setSuccess(""); // Clear success message
