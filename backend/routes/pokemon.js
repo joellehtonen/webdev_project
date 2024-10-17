@@ -16,12 +16,13 @@ const POKEAPI_URL = 'https://pokeapi.co/api/v2/';
 // }
 
 const isValidInput = (input) => {
-	return typeof input === 'string' && /^[a-zA-Z]+$/.test(input);
+    // Allow letters, numbers, and hyphens in the Pokémon names
+    return typeof input === 'string' && /^[a-zA-Z0-9-]+$/.test(input);
 };
+
 
 router.get('/', async (req, res) => {
 	const {name, type} = req.query;
-	console.log(name)
 	if (name && !isValidInput(name)) {
 		return res.status(400).json({error: 'Invalid input provided'})
 	}
@@ -41,7 +42,7 @@ router.get('/', async (req, res) => {
 		}
 		else if (name) {
 			//const nameResponse = await axios.get(`${POKEAPI_URL}pokemon/${name}`);
-			response = await axios.get(`${POKEAPI_URL}pokemon/${name}`)//nameResponse.data//.results.filter(p => p.name.includes(name));
+			response = await axios.get(`${POKEAPI_URL}pokemon/${encodeURIComponent(name)}`)//nameResponse.data//.results.filter(p => p.name.includes(name));
 		}
 		else if (type) {
 			const typeResponse = await axios.get(`${POKEAPI_URL}/type/${type}`);
