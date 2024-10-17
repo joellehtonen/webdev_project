@@ -1,19 +1,19 @@
 const express = require('express');
 const axios = require('axios');
-const NodeCache = require('node-cache');
+// const NodeCache = require('node-cache');
 
 const router = express.Router();
 const POKEAPI_URL = 'https://pokeapi.co/api/v2/';
 
-const cache = new NodeCache();
-const MAX_CACHE_SIZE = 50;
+// const cache = new NodeCache();
+// const MAX_CACHE_SIZE = 50;
 
-const manageCacheSize = () => {
-	const keys = cache.keys();
-	if (keys.length > MAX_CACHE_SIZE) {
-		cache.del(keys[0]);
-	}
-}
+// const manageCacheSize = () => {
+// 	const keys = cache.keys();
+// 	if (keys.length > MAX_CACHE_SIZE) {
+// 		cache.del(keys[0]);
+// 	}
+// }
 
 const isValidInput = (input) => {
 	return typeof input === 'string' && /^[a-zA-Z]+$/.test(input);
