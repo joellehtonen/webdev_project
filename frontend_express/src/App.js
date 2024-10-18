@@ -45,7 +45,7 @@ const handleLogout = () => {
       <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
         <div className="container align-items-center">
           <div className="navbar-header">
-            <a className="navbar-brand" href="/">Pokemon Finder</a>
+            <a className="navbar-brand" href="/">Pokémon Finder</a>
           </div>
           <ul className="navbar-nav">
             { isLoggedIn
