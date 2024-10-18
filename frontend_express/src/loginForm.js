@@ -33,8 +33,10 @@ const LoginPage = () => {
 
             if (response.ok) {
 
-                // If login is successful, store login status in localStorage
+                // If login is successful, store login status and username in localStorage
                 localStorage.setItem('auth_token', data.auth_token);
+                localStorage.setItem('username', data.username);
+                console.log('Stored username:', username);
                 //console.log(data.auth_token)
 
                 // If login is successful, show success message5

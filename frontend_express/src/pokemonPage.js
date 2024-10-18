@@ -55,7 +55,7 @@ const PokemonPage = () => {
             alert('Please log in to like Pokémon.');
             return;
         }
-
+        
         try {
             if (liked) {
                 // Unlike the Pokémon
