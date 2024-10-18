@@ -38,12 +38,17 @@ const PokemonList = () => {
         }
     }, [searchQuery, pokemonList]);
 
-    if (loading) return <h2>Loading...</h2>;
+	if (loading) {
+		return (
+		<div class="alert alert-secondary text-center" role="alert">
+		Loading...
+		</div>
+		)
+	}
     if (error) return <h2>{error}</h2>;
 
     return (
         <div>
-            <h1>Pokémon List</h1>
             <input
                 type="text"
                 placeholder="Search Pokémon"

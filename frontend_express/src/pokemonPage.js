@@ -7,18 +7,16 @@ const PokemonPage = () => {
     const { name } = useParams();
     const [pokemon, setPokemon] = useState(null);
     const [error, setError] = useState(null);
-    const [liked, setLiked] = useState(false);
-    const [likeId, setLikeId] = useState(null); // To store the like ID
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userId, setUserId] = useState(null); // To hold the user ID
+    const [userId, setUserId] = useState(null);
+    const [liked, setLiked] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem('authToken');
-        console.log(token)
+        const token = localStorage.getItem('auth_token');
+        //console.log(token)
         if (token && token.split('.').length === 3) { // Check if it has 3 parts
             setIsLoggedIn(true);
             const decodedToken = jwtDecode(token);
-            console.log(decodedToken)
             setUserId(decodedToken.id);
         } else {
             console.error("Invalid token format:", token);
@@ -30,63 +28,64 @@ const PokemonPage = () => {
         
         try {
             const response = await axios.get(`http://localhost:5000/pokemon?name=${encodeURIComponent(name)}`)
-//            const data  = await response.json();
             setPokemon(response.data);
-            console.log(pokemon)
             setError(null)
+
+            if (isLoggedIn && userId) {
+                const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
+                const userLikes = likesResponse.data;
+                const isLiked = userLikes.some(like => like.pokemon_id === response.data.id);
+                setLiked(isLiked);
+            }
+
         } catch (err) {
             console.error(err);
             setError(err.response ? err.response.data.message : "An unknown error occurred");
         }
-    }, [name])
+    }, [name, isLoggedIn, userId])
 
     useEffect(() => {
         fetchPokemonPage();
-    }, [fetchPokemonPage])
-
-    useEffect(() => {
-        const checkIfLiked = async () => {
-            if (isLoggedIn && userId) {
-                try {
-                    const res = await axios.get(`http://localhost:5000/likes/user/${userId}`);
-                    const likedPokemons = res.data.map(like => like.pokemon_id);
-                    const likedEntry = res.data.find(like => like.pokemon_id === name);
-                    setLiked(likedPokemons.includes(name));
-                    if (likedEntry) {
-                        setLikeId(likedEntry.id); // Store the like ID
-                    }
-                } catch (err) {
-                    console.error(err);
-                }
-            }
-        };
-        checkIfLiked();
-    }, [isLoggedIn, userId, name]);
-
-    console.log("Is user logged in:", isLoggedIn);
+    }, [fetchPokemonPage]) 
 
     const handleLike = async () => {
         if (!isLoggedIn) {
-            alert('You must be logged in to like Pokémon');
+            alert('Please log in to like Pokémon.');
             return;
         }
         
         try {
             if (liked) {
                 // Unlike the Pokémon
-                const response = await axios.delete(`http://localhost:5000/likes/delete/${likeId}`); // Use the stored likeId
-                console.log(response.data); // Log success message
-                setLikeId(null); // Reset the likeId
+                const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
+                const userLikes = likesResponse.data;
+                const likeToDelete = userLikes.find(like => like.pokemon_id === pokemon.id);
+
+                if (likeToDelete) {
+                    await axios.delete(`http://localhost:5000/likes/delete/${likeToDelete.id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                        },
+                    });
+                    setLiked(false);
+                    alert(`Unliked Pokémon ID: ${pokemon.id}`);
+                }
             } else {
                 // Like the Pokémon
-                const response = await axios.post(`http://localhost:5000/likes/add`, { pokemon_id: id});
-                console.log(response.data); // Log success message
-                setLikeId(response.data[0].id); // Store the newly created like ID
+                await axios.post('http://localhost:5000/likes/add', {
+                    pokemon_id: pokemon.id
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                    },
+                });
+                setLiked(true);
+                alert(`Liked Pokémon ID: ${pokemon.id}`);
             }
-            setLiked(!liked); // Toggle liked state
-        } catch (err) {
-            console.error(err);
-            alert(err.response ? err.response.data.error : "An unknown error occurred");
+        } catch (error) {
+            console.error('Error handling like/unlike:', error);
+            alert('An error occurred while trying to like/unlike the Pokémon.');
         }
     };
 

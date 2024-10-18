@@ -1,30 +1,3 @@
-/*import React from 'react';
-import './App.css';
-import PokemonList from './pokemonList';
-import { Router, Link } from "react-router-dom"
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
-
-export default App;*/
 
 // src/App.js
 
@@ -32,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom'; // Import Link here
 import PokemonList from './pokemonList'; // Adjust the import path as necessary
 import RegisterForm from './registerForm';//
+import RegisterPage from './registerPage';//
 import LoginPage from './loginForm';
 import UserPage from './userPage';
 import PokemonPage from './pokemonPage';
@@ -46,13 +20,13 @@ function App() {
 
   useEffect(() => {
     // Check login status in localStorage
-    const token = localStorage.getItem('authToken'); // Check for token presence instead of 'isLoggedIn'
+    const token = localStorage.getItem('auth_token'); // Check for token presence instead of 'isLoggedIn'
     const userName = localStorage.getItem('userName');
     if (token/* && !IsTokenExpired(token)*/) {
       setIsLoggedIn(!!token); // Set isLoggedIn based on token presence
       setUserName(userName);
     } else {
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('auth_token');
       localStorage.removeItem('userName');
       setIsLoggedIn(false);
       setUserName('');
@@ -61,7 +35,7 @@ function App() {
 
 const handleLogout = () => {
     // Clear the login state and token
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('auth_token');
     localStorage.removeItem('userName');
     setIsLoggedIn(false);
     setUserName('');
@@ -84,16 +58,38 @@ const handleLogout = () => {
       {!isLoggedIn && location.pathname !== '/login' && (
         <div>
           <RegisterForm />
+      <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
+        <div className="container align-items-center">
+          <div className="navbar-header">
+            <a className="navbar-brand" href="/">Pokémon Finder</a>
+          </div>
+          <ul className="navbar-nav">
+            { isLoggedIn
+              ? 
+              /* Show Logout button if logged in */
+              <>
+                <li className="nav-item">
+                  <a className="nav-link" href="/user">Todo: Username Here</a>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link" onClick={handleLogout}>Logout</button>
+                </li>
+              </>
+              :
+              <>
+              <li className="nav-item">
+                <a className="nav-link" href="/login">Sign in</a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="/register">Register</a>
+              </li>
+              </>
+            }
+          </ul>
         </div>
-      )}
+      </nav>
 
       <div>
-        {!isLoggedIn && (
-          <nav>
-            <Link to="/login">Login</Link>
-          </nav>
-        )}
-
         {/* Define the routes for Login and Pokemon List */}
         <Routes>
           <Route path="/login" element={<LoginPage />} />
@@ -101,23 +97,20 @@ const handleLogout = () => {
         </Routes>
       </div>
 
-      {/* Show Logout button if logged in */}
-      {isLoggedIn && (
-          <div>
-              <button onClick={handleLogout}>Logout</button>
-          </div>
-      )}
-
-      <nav>
-        <Link to="/pokemon">View Pokémon List</Link>
-      </nav>
-
       <Routes>
-        <Route path="/pokemon" element={<PokemonList />} />
+        <Route path="/" element={<PokemonList />} />
         <Route
           path="/pokemon/:name"
           element={<PokemonPage />}
-          />
+        />
+      </Routes>
+
+      <Routes>
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
       </Routes>
     </div>
   );
