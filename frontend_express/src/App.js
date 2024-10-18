@@ -41,8 +41,8 @@ import PokemonPage from './pokemonPage';
 function App() {
   const location = useLocation(); // Get the current route
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
   const [userName, setUserName] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check login status in localStorage
@@ -55,6 +55,7 @@ function App() {
       localStorage.removeItem('authToken');
       localStorage.removeItem('userName');
       setIsLoggedIn(false);
+      setUserName('');
     }
 }, [location]); // Re-run effect when location (route) changes
 
@@ -63,6 +64,7 @@ const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userName');
     setIsLoggedIn(false);
+    setUserName('');
     navigate('/login'); // Redirect to login after logout
 };
 
@@ -71,10 +73,10 @@ const handleLogout = () => {
       <h1>
         <Link to="/">Pokemon Finder</Link>
       </h1>
-
+      {/*disply username that links to userpage if logged in*/}
       {isLoggedIn && (
         <nav>
-          <Link to="/user">{userName}</Link>
+          <Link to={`/user/${userName}`}>{userName}</Link>
         </nav>
       )}
 

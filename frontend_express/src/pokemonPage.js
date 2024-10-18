@@ -70,7 +70,7 @@ const PokemonPage = () => {
             alert('You must be logged in to like Pokémon');
             return;
         }
-
+        
         try {
             if (liked) {
                 // Unlike the Pokémon
@@ -79,7 +79,7 @@ const PokemonPage = () => {
                 setLikeId(null); // Reset the likeId
             } else {
                 // Like the Pokémon
-                const response = await axios.post(`http://localhost:5000/likes/add`, { pokemon_id: name });
+                const response = await axios.post(`http://localhost:5000/likes/add`, { pokemon_id: id});
                 console.log(response.data); // Log success message
                 setLikeId(response.data[0].id); // Store the newly created like ID
             }
