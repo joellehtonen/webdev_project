@@ -56,26 +56,35 @@ const LoginPage = () => {
     };
 
     return (
-        <div>
-            <h1>Login</h1>
-            <form onSubmit={handleLogin}>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <button type="submit">Login</button>
-            </form>
+        <div className="container text-center">
             {/* Display success or error messages */}
             {success && <p style={{ color: 'green' }}>{success}</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}
+            <div className="row justify-content-md-center">
+                <form className="col col-lg-6" onSubmit={handleLogin}>
+                    <div className="mb-3">
+                        <label htmlFor="username" className="form-label">Username</label>
+                        <input
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            className="form-control"
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="password" className="form-label">Password</label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="form-control"
+                        />
+                    </div>
+                    <button type="submit" className="btn btn-primary">Login</button>
+                </form>
+            </div>
         </div>
     );
 };

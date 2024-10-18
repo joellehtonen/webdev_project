@@ -43,7 +43,6 @@ const PokemonList = () => {
 
     return (
         <div>
-            <h1>Pokémon List</h1>
             <input
                 type="text"
                 placeholder="Search Pokémon"
