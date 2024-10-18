@@ -10,6 +10,8 @@ const PokemonPage = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userId, setUserId] = useState(null);
     const [liked, setLiked] = useState(false);
+    const [likeMessage, setLikeMessage] = useState(''); // State for error messages
+    const [unlikeMessage, setUnlikeMessage] = useState(''); // State for success messages
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
@@ -68,7 +70,10 @@ const PokemonPage = () => {
                         },
                     });
                     setLiked(false);
-                    alert(`Unliked Pokémon ID: ${pokemon.id}`);
+                    setUnlikeMessage(`Unliked Pokémon : ${pokemon.name}`);
+                    setTimeout(() => {
+                        setUnlikeMessage('');
+                    }, 2000);
                 }
             } else {
                 // Like the Pokémon
@@ -81,7 +86,11 @@ const PokemonPage = () => {
                     },
                 });
                 setLiked(true);
-                alert(`Liked Pokémon ID: ${pokemon.id}`);
+                setLikeMessage(`Liked Pokémon : ${pokemon.name}`);
+                setTimeout(() => {
+                    setLikeMessage('');
+                }, 2000);
+                //alert(`Liked Pokémon ID: ${pokemon.id}`);
             }
         } catch (error) {
             console.error('Error handling like/unlike:', error);
@@ -109,6 +118,9 @@ const PokemonPage = () => {
                 {liked ? 'Unlike' : 'Like'}
             </button>
             
+            {likeMessage && <p style={{ color: 'green' }}>{likeMessage}</p>}
+            {unlikeMessage && <p style={{ color: 'red' }}>{unlikeMessage}</p>}
+
             <div className="flex-col">
                 {pokemon.stats.map((statObject) => {
                     const statName = statObject.stat.name;

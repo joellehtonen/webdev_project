@@ -19,3 +19,25 @@
 .pokemon-card:hover {
     transform: scale(1.05); /* Scale up the card slightly on hover */
 }
+
+.dropdown-list {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    z-index: 1000; /* Ensure dropdown appears above other elements */
+    max-height: 200px;
+    overflow-y: auto; /* Add scroll if too many items */
+    width: calc(100% - 16px); /* Match input width, accounting for padding */
+}
+
+.dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    text-decoration: none; /* Remove underline */
+    color: black; /* Link color */
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0; /* Highlight on hover */
+}
