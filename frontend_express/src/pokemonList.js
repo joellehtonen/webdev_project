@@ -71,7 +71,13 @@ const PokemonList = () => {
         }
     }, [userSearchQuery, users]);
 
-    if (loading) return <h2>Loading...</h2>;
+	if (loading) {
+		return (
+		<div class="alert alert-secondary text-center" role="alert">
+		Loading...
+		</div>
+		)
+	}
     if (error) return <h2>{error}</h2>;
 
     const totalPages = Math.ceil(filteredList.length / itemsPerPage)
