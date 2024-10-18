@@ -1,4 +1,3 @@
-// src/PokemonList.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './pokemonList.css';
@@ -11,17 +10,19 @@ const PokemonList = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredList, setFilteredList] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 50 
+    const itemsPerPage = 50;
     const [users, setUsers] = useState([]);
-    const [userSearchQuery, setUserSearchQuery] = useState(''); // State for user search query
+    const [userSearchQuery, setUserSearchQuery] = useState('');
     const [filteredUsers, setFilteredUsers] = useState([]);
-    const [showDropdown, setShowDropdown] = useState(false);
+    const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+    const [types, setTypes] = useState([]);
 
+    // Fetch Pokémon data
     useEffect(() => {
         const fetchPokemon = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/pokemon');
-                setPokemon(response.data.results); // Access the results array
+                setPokemon(response.data.results);
                 setLoading(false);
                 setFilteredList(response.data.results);
             } catch (err) {
@@ -33,6 +34,7 @@ const PokemonList = () => {
         fetchPokemon();
     }, []);
 
+    // Filter Pokémon based on search query
     useEffect(() => {
         if (searchQuery) {
             const filtered = pokemonList.filter(pokemon =>
@@ -42,54 +44,68 @@ const PokemonList = () => {
         } else {
             setFilteredList(pokemonList);
         }
+        setCurrentPage(1);
     }, [searchQuery, pokemonList]);
 
-    useEffect  (() => {
-        const fetchUser = async () => {
+    // Fetch users data
+    useEffect(() => {
+        const fetchUsers = async () => {
             try {
-                const resp = await axios.get('http://localhost:5000/users')
-                setUsers(resp.data)
+                const resp = await axios.get('http://localhost:5000/users');
+                setUsers(resp.data);
                 setFilteredUsers(resp.data);
             } catch (err) {
                 setError('Failed to fetch users');
             }
-        }
-        fetchUser ();
-    }, [])
+        };
+        fetchUsers();
+    }, []);
 
+    // Filter users based on search query
     useEffect(() => {
         if (userSearchQuery) {
             setFilteredUsers(
                 users.filter((user) =>
-                    user.username.toLowerCase().includes(userSearchQuery.toLowerCase()) // Search in the 'username'
+                    user.username.toLowerCase().includes(userSearchQuery.toLowerCase())
                 )
             );
-            setShowDropdown(true); // Show the dropdown when typing
         } else {
-            setFilteredUsers([]); // If search query is empty, clear the filtered users
-            setShowDropdown(false); // Hide the dropdown if the search query is empty
+            setFilteredUsers([]); // Clear filtered users
         }
     }, [userSearchQuery, users]);
 
-	if (loading) {
-		return (
-		<div class="alert alert-secondary text-center" role="alert">
-		Loading...
-		</div>
-		)
-	}
+    // Fetch Pokémon types
+    useEffect(() => {
+        const fetchPokemonTypes = async () => {
+            try {
+                const resp = await axios.get('http://localhost:5000/pokemon/type');
+                setTypes(resp.data); // Expecting an array of types
+            } catch (err) {
+                setError('Failed to fetch types');
+            }
+        };
+        fetchPokemonTypes();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="alert alert-secondary text-center" role="alert">
+                Loading...
+            </div>
+        );
+    }
     if (error) return <h2>{error}</h2>;
 
-    const totalPages = Math.ceil(filteredList.length / itemsPerPage)
-    const paginatedList = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+    const totalPages = Math.ceil(filteredList.length / itemsPerPage);
+    const paginatedList = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const goToNextPage = () => {
         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-      };
-    
-      const goToPreviousPage = () => {
+    };
+
+    const goToPreviousPage = () => {
         if (currentPage > 1) setCurrentPage(currentPage - 1);
-      };
+    };
 
     return (
         <div>
@@ -97,7 +113,7 @@ const PokemonList = () => {
                 type="text"
                 placeholder="Search Pokémon"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)} // Update the search query
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="border rounded p-2 mb-4"
             />
 
@@ -111,7 +127,26 @@ const PokemonList = () => {
                             className="dropdown-item" // Class for styling
                             onClick={() => setUserSearchQuery('')} // Clear the search query on click
                         >
-                            {user.username} {/* Display the username */}
+                            {user.username}
+                        </Link>
+                    ))}
+                </div>
+            )}
+
+            {/* Pokémon Types Dropdown */}
+            <button onClick={() => setShowTypeDropdown(prev => !prev)}>Pokemon Types</button>
+            {showTypeDropdown && types.length > 0 && (
+                <div className="dropdown-list">
+                    {types.map((type) => (
+                        <Link
+                            key={type.name}
+                            to={`/pokemon/type/${type.name}`}
+                            className="dropdown-item"
+                            onClick={() => {
+                                setShowTypeDropdown(false); // Hide dropdown after selection
+                            }}
+                        >
+                            {type.name.charAt(0).toUpperCase() + type.name.slice(1)} {/* Capitalize first letter */}
                         </Link>
                     ))}
                 </div>
@@ -121,17 +156,17 @@ const PokemonList = () => {
                 type="text"
                 placeholder="Search User"
                 value={userSearchQuery}
-                onChange={(e) => setUserSearchQuery(e.target.value)} // Update the search query
+                onChange={(e) => setUserSearchQuery(e.target.value)}
                 className="border rounded p-2 mb-4"
             />
 
             <div className="pokemon-grid">
                 {paginatedList.map((poke) => (
                     <div className="pokemon-card" key={poke.name}>
-                        <Link to ={`/pokemon/${poke.name}`}>
-                       <h3>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3> {/* Capitalize the first letter */}
-                       </Link>
-                  </div>
+                        <Link to={`/pokemon/${poke.name}`}>
+                            <h3>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3>
+                        </Link>
+                    </div>
                 ))}
             </div>
             <div className="pagination">

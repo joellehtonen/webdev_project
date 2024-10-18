@@ -21,6 +21,16 @@ const isValidInput = (input) => {
 };
 
 
+router.get('/type', async (req, res) => {
+	try {
+		const resp = await axios.get(`${POKEAPI_URL}type`)
+		res.json(resp.data.results)
+	} catch (err) {
+		console.error(err)
+		res.status(500).json({ error: "Failed to fetch Pokémon types" })
+	}
+})
+
 router.get('/', async (req, res) => {
 	const {name, type} = req.query;
 	if (name && !isValidInput(name)) {
@@ -34,19 +44,20 @@ router.get('/', async (req, res) => {
 	try {
 		let response;
 
-		if (name && type) {
+		/*if (name && type) {
 			const typeResponse = await axios.get(`${POKEAPI_URL}type/${type}`);
 			response = typeResponse.data.pokemon.filter(p => p.pokemon.name.includes(name));
 			if (response.length === 0)
 					return res.status(404).json({message: 'No Pokemon found of that name and type'});
 		}
-		else if (name) {
+		else */if (name) {
 			//const nameResponse = await axios.get(`${POKEAPI_URL}pokemon/${name}`);
 			response = await axios.get(`${POKEAPI_URL}pokemon/${encodeURIComponent(name)}`)//nameResponse.data//.results.filter(p => p.name.includes(name));
 		}
 		else if (type) {
-			const typeResponse = await axios.get(`${POKEAPI_URL}/type/${type}`);
-			response = typeResponse.data.pokemon.map(p => p.pokemon);
+			//const typeResponse = await axios.get(`${POKEAPI_URL}type/${encodeURIComponent(type)}`);
+			//response = typeResponse.data.pokemon.map(p => p.pokemon);
+			response = await axios.get(`${POKEAPI_URL}type/${encodeURIComponent(type)}`);
 		}
 		else {
 			response = await axios.get(`${POKEAPI_URL}pokemon?limit=1305`);
