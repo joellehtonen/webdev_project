@@ -8,10 +8,8 @@ const { router: authRoutes, authMiddleware } = require('./auth');
 const router = express.Router();
 
 // get all likes from an user
-router.get('/user/:userId', authMiddleware, async (req, res) => {
+router.get('/user/:userId', async (req, res) => {
 	const {userId} = req.params;
-
-	//console.log("Fetching likes for user ID:", userId); // Debug log
 
 	try {
 		const result = await pool.query(`

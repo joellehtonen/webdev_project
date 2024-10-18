@@ -46,13 +46,13 @@ function App() {
 
   useEffect(() => {
     // Check login status in localStorage
-    const token = localStorage.getItem('authToken'); // Check for token presence instead of 'isLoggedIn'
+    const token = localStorage.getItem('auth_token'); // Check for token presence instead of 'isLoggedIn'
     const userName = localStorage.getItem('userName');
     if (token/* && !IsTokenExpired(token)*/) {
       setIsLoggedIn(!!token); // Set isLoggedIn based on token presence
       setUserName(userName);
     } else {
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('auth_token');
       localStorage.removeItem('userName');
       setIsLoggedIn(false);
     }
@@ -60,7 +60,7 @@ function App() {
 
 const handleLogout = () => {
     // Clear the login state and token
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('auth_token');
     localStorage.removeItem('userName');
     setIsLoggedIn(false);
     navigate('/login'); // Redirect to login after logout

@@ -34,8 +34,8 @@ const LoginPage = () => {
             if (response.ok) {
 
                 // If login is successful, store login status in localStorage
-                localStorage.setItem('authToken', data.auth_token);
-                console.log(data.auth_token)
+                localStorage.setItem('auth_token', data.auth_token);
+                //console.log(data.auth_token)
 
                 // If login is successful, show success message5
                 setSuccess('Login successful! Redirecting to the home page ...');
