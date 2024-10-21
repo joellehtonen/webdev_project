@@ -28,7 +28,7 @@ app.get('/users', async (req, res) => {
 		console.error(err);
 		res.status(500).json({error: "Internal server error"})
 	}
-})
+});
 
 // get a specific user
 app.get('/users/:id', async (req, res) => {
@@ -44,7 +44,7 @@ app.get('/users/:id', async (req, res) => {
 		console.error(err);
 		res.status(500).json({error: "Internal server error"})
 	}
-})
+});
 
 // Get username by authtoken
 app.post('/get_user_by_token', authMiddleware, async (req, res) => {
