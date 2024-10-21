@@ -16,6 +16,9 @@ const PokemonList = () => {
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [showTypeDropdown, setShowTypeDropdown] = useState(false);
     const [types, setTypes] = useState([]);
+    const [selectedType, setSelectedType] = useState(null)
+    const [sortAZ, setSortAZ] = useState(false); // A-Z checkbox
+    const [sortZA, setSortZA] = useState(false); // Z-A checkbox
 
     // Fetch Pokémon data
     useEffect(() => {
@@ -36,28 +39,37 @@ const PokemonList = () => {
 
     // Filter Pokémon based on search query
     useEffect(() => {
+        let filtered = pokemonList;
+
         if (searchQuery) {
-            const filtered = pokemonList.filter(pokemon =>
+            filtered = filtered.filter(pokemon =>
                 pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
-            setFilteredList(filtered);
-        } else {
-            setFilteredList(pokemonList);
         }
+
+        // Sort if checkboxes are checked
+        if (sortAZ || sortZA) {
+            filtered = sortPokemons(filtered);
+        }
+
+        setFilteredList(filtered);
         setCurrentPage(1);
-    }, [searchQuery, pokemonList]);
+    }, [searchQuery, pokemonList, sortAZ, sortZA]);
 
     // Fetch users data
     useEffect(() => {
+        const token = localStorage.getItem('auth_token')
         const fetchUsers = async () => {
-            try {
-                const resp = await axios.get('http://localhost:5000/users');
-                setUsers(resp.data);
-                setFilteredUsers(resp.data);
-            } catch (err) {
-                setError('Failed to fetch users');
+            if (token) {
+                try {
+                    const resp = await axios.get('http://localhost:5000/users');
+                    setUsers(resp.data);
+                    setFilteredUsers(resp.data);
+                } catch (err) {
+                    setError('Failed to fetch users');
+                }
             }
-        };
+        }
         fetchUsers();
     }, []);
 
@@ -88,16 +100,55 @@ const PokemonList = () => {
     }, []);
 
     const filterByType = async (type) => {
-        try {
-            const resp = await axios.get(`http://localhost:5000/pokemon/type${type}`)
-            const pokemonByType = resp.data.pokemon
-            setFilteredList(pokemonByType)
+        setSearchQuery('')
+        if (type === 'all') {
+            setFilteredList(sortPokemons(pokemonList))
+            setSelectedType(null)
             setShowTypeDropdown(false)
             setCurrentPage(1)
+            return;
+        }
+        try {
+            const resp = await axios.get(`http://localhost:5000/pokemon?type=${type}`)
+            console.log(resp.data);
+            const pokemonByType = resp.data.pokemon.map(p => ({
+                name: p.pokemon.name,
+                url: p.pokemon.url,
+                types: p.pokemon.types
+            }))
+            setFilteredList(sortPokemons(pokemonByType))
+            setShowTypeDropdown(false)
+            setCurrentPage(1)
+            setSelectedType(type)
         } catch (err) {
             setError(`Failed to fetch pokemon by type`)
         }
     }
+
+    const sortPokemons = (list) => {
+        return [...list].sort((a, b) => {
+            const nameA = a.name.toLowerCase()
+            const nameB = b.name.toLowerCase()
+
+            if (sortAZ && !sortZA) {
+                return nameA.localeCompare(nameB);
+            } else if (sortZA && !sortAZ) {
+                return nameB.localeCompare(nameA);
+            }
+            return 0
+        })
+    }
+
+    // Update sorting states
+    const handleSortAZ = () => {
+        setSortAZ(prev => !prev); // Toggle A-Z sorting
+        if (sortZA) setSortZA(false); // Ensure Z-A is off
+    };
+
+    const handleSortZA = () => {
+        setSortZA(prev => !prev); // Toggle Z-A sorting
+        if (sortAZ) setSortAZ(false); // Ensure A-Z is off
+    };
 
     if (loading) {
         return (
@@ -129,6 +180,34 @@ const PokemonList = () => {
                 className="border rounded p-2 mb-4"
             />
 
+            {/* Pokémon Types Dropdown */}
+            <button onClick={() => setShowTypeDropdown(prev => !prev)}>
+                {selectedType ? `Filter by ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}` : 'Pokemon Types'}
+            </button>
+            {showTypeDropdown && types.length > 0 && (
+                <div className="dropdown-list">
+                    <div
+                        className="dropdown-item"
+                        onClick={() => filterByType('all')} // Handle "All Pokémon"
+                    >
+                        All Pokémon
+                    </div>
+                    {types.map((type) => (
+                        <div
+                            key={type.name}
+                            /*to={`/pokemon/type/${type.name}`}*/
+                            className="dropdown-item"
+                            onClick={() => //{
+                                //setShowTypeDropdown(false); // Hide dropdown after selection
+                                filterByType(type.name)
+                            }//}
+                        >
+                            {type.name.charAt(0).toUpperCase() + type.name.slice(1)} {/* Capitalize first letter */}
+                        </div>
+                    ))}
+                </div>
+            )}
+
             {/* User Dropdown List */}
             {filteredUsers.length > 0 && (
                 <div className="dropdown-list">
@@ -145,26 +224,6 @@ const PokemonList = () => {
                 </div>
             )}
 
-            {/* Pokémon Types Dropdown */}
-            <button onClick={() => setShowTypeDropdown(prev => !prev)}>Pokemon Types</button>
-            {showTypeDropdown && types.length > 0 && (
-                <div className="dropdown-list">
-                    {types.map((type) => (
-                        <Link
-                            key={type.name}
-                            /*to={`/pokemon/type/${type.name}`}*/
-                            className="dropdown-item"
-                            onClick={() => //{
-                                //setShowTypeDropdown(false); // Hide dropdown after selection
-                                filterByType(type.name)
-                            }//}
-                        >
-                            {type.name.charAt(0).toUpperCase() + type.name.slice(1)} {/* Capitalize first letter */}
-                        </Link>
-                    ))}
-                </div>
-            )}
-
             <input
                 type="text"
                 placeholder="Search User"
@@ -172,6 +231,25 @@ const PokemonList = () => {
                 onChange={(e) => setUserSearchQuery(e.target.value)}
                 className="border rounded p-2 mb-4"
             />
+
+            <div>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={sortAZ}
+                        onChange={handleSortAZ}
+                    />
+                    Sort A-Z
+                </label>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={sortZA}
+                        onChange={handleSortZA}
+                    />
+                    Sort Z-A
+                </label>
+            </div>
 
             <div className="pokemon-grid">
                 {paginatedList.map((poke) => (
