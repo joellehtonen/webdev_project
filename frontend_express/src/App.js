@@ -45,16 +45,16 @@ const handleLogout = () => {
 
   return (
     <div>
-      <h1>
+      {/*<h1>
         <Link to="/">Pokemon Finder</Link>
-      </h1>
+      </h1>*/}
       {/* Conditionally render RegisterForm if not on the /login route */}
-      {!isLoggedIn && location.pathname !== '/login' && (
+      {/*!isLoggedIn && location.pathname !== '/login' && (
         <div>
           <RegisterForm />
         </div>
-      )}
-
+      )*/}
+      
       <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
         <div className="container align-items-center">
           <div className="navbar-header">
