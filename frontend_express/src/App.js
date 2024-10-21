@@ -66,7 +66,6 @@ const handleLogout = () => {
               /* Show Logout button if logged in */
               <>
                 <li className="nav-item">
-                {/* <Link className="nav-link" to={`/user/${userName}`}>{userName}</Link> */}
                 <a className="nav-link" href="/user">Todo: Username Here</a>
                 </li>
                 <li className="nav-item">
@@ -91,7 +90,8 @@ const handleLogout = () => {
         {/* Define the routes for Login and Pokemon List */}
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/user/:username" element={<UserPage/>} />
+          <Route path="/user/:userId" element={<UserPage/>} />
+          <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </div>
 
@@ -103,9 +103,6 @@ const handleLogout = () => {
         />
       </Routes>
 
-      <Routes>
-        <Route path="/register" element={<RegisterPage />} />
-      </Routes>
     </div>
   );
 }

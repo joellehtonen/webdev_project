@@ -25,7 +25,7 @@ do
 
 	for ((i=0;i<$RANDOM_LIKES_PER_USER;i++))
 	do
-		POKEMON_ID=$((1 + $RANDOM % 1300))
+		POKEMON_ID=$((1 + $RANDOM % 1000))
 		echo "User $USER is liking Pokemon $POKEMON_ID"
 
 		CMD="curl -s -H 'Content-Type: application/json' -H 'authorization: Bearer ${KEY}' \
