@@ -87,6 +87,18 @@ const PokemonList = () => {
         fetchPokemonTypes();
     }, []);
 
+    const filterByType = async (type) => {
+        try {
+            const resp = await axios.get(`http://localhost:5000/pokemon/type${type}`)
+            const pokemonByType = resp.data.pokemon
+            setFilteredList(pokemonByType)
+            setShowTypeDropdown(false)
+            setCurrentPage(1)
+        } catch (err) {
+            setError(`Failed to fetch pokemon by type`)
+        }
+    }
+
     if (loading) {
         return (
             <div className="alert alert-secondary text-center" role="alert">
@@ -140,11 +152,12 @@ const PokemonList = () => {
                     {types.map((type) => (
                         <Link
                             key={type.name}
-                            to={`/pokemon/type/${type.name}`}
+                            /*to={`/pokemon/type/${type.name}`}*/
                             className="dropdown-item"
-                            onClick={() => {
-                                setShowTypeDropdown(false); // Hide dropdown after selection
-                            }}
+                            onClick={() => //{
+                                //setShowTypeDropdown(false); // Hide dropdown after selection
+                                filterByType(type.name)
+                            }//}
                         >
                             {type.name.charAt(0).toUpperCase() + type.name.slice(1)} {/* Capitalize first letter */}
                         </Link>
