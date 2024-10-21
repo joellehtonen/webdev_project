@@ -58,15 +58,18 @@ const PokemonList = () => {
 
     // Fetch users data
     useEffect(() => {
+        const token = localStorage.getItem('auth_token')
         const fetchUsers = async () => {
-            try {
-                const resp = await axios.get('http://localhost:5000/users');
-                setUsers(resp.data);
-                setFilteredUsers(resp.data);
-            } catch (err) {
-                setError('Failed to fetch users');
+            if (token) {
+                try {
+                    const resp = await axios.get('http://localhost:5000/users');
+                    setUsers(resp.data);
+                    setFilteredUsers(resp.data);
+                } catch (err) {
+                    setError('Failed to fetch users');
+                }
             }
-        };
+        }
         fetchUsers();
     }, []);
 
@@ -146,10 +149,6 @@ const PokemonList = () => {
         setSortZA(prev => !prev); // Toggle Z-A sorting
         if (sortAZ) setSortAZ(false); // Ensure A-Z is off
     };
-
-/*    useEffect(() => {
-        setFilteredList(sortPokemons(filteredList, sortOrder))
-    }, [sortOrder, pokemonList])*/
 
     if (loading) {
         return (

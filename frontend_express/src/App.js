@@ -106,7 +106,7 @@ const handleLogout = () => {
         {/* Define the routes for Login and Pokemon List */}
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/user/:username" element={<UserPage/>} />
+          <Route path="/user/:username" element={<UserPage />} />
         </Routes>
       </div>
 
