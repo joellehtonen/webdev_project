@@ -20,7 +20,6 @@ const isValidInput = (input) => {
     return typeof input === 'string' && /^[a-zA-Z0-9-]+$/.test(input);
 };
 
-
 router.get('/', async (req, res) => {
 	const {name, type} = req.query;
 	if (name && !isValidInput(name)) {
