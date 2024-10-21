@@ -61,66 +61,59 @@ const handleLogout = () => {
 
   return (
     <div>
-      {/*<h1>
-        <Link to="/">Pokemon Finder</Link>
-      </h1>*/}
-      {/* Conditionally render RegisterForm if not on the /login route */}
-      {/*!isLoggedIn && location.pathname !== '/login' && (
-        <div>
-          <RegisterForm />
-        </div>
-      )*/}
-      
-      <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
-        <div className="container align-items-center">
-          <div className="navbar-header">
-            <a className="navbar-brand" href="/">Pokémon Finder</a>
+      <header>
+        <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
+          <div className="container align-items-center">
+            <div className="navbar-header">
+              <a className="navbar-brand" href="/">Pokémon Finder</a>
+            </div>
+            <ul className="navbar-nav">
+              { isLoggedIn
+                ? 
+                /* Show Logout button if logged in */
+                <>
+                  <li className="nav-item">
+                  <Link className="nav-link" to={`/user/${userId}`}>{userName}'s Home</Link>
+                  </li>
+                  <li className="nav-item">
+                    <button className="nav-link" onClick={handleLogout}>Logout</button>
+                  </li>
+                </>
+                :
+                <>
+                <li className="nav-item">
+                  <a className="nav-link" href="/login">Sign in</a>
+                </li>
+                <li className="nav-item">
+                  <a className="nav-link" href="/register">Register</a>
+                </li>
+                </>
+              }
+            </ul>
           </div>
-          <ul className="navbar-nav">
-            { isLoggedIn
-              ? 
-              /* Show Logout button if logged in */
-              <>
-                <li className="nav-item">
-                <Link className="nav-link" to={`/user/${userId}`}>{userName}'s Home</Link>
-                </li>
-                <li className="nav-item">
-                  <button className="nav-link" onClick={handleLogout}>Logout</button>
-                </li>
-              </>
-              :
-              <>
-              <li className="nav-item">
-                <a className="nav-link" href="/login">Sign in</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="/register">Register</a>
-              </li>
-              </>
-            }
-          </ul>
-        </div>
-      </nav>
+        </nav>
+      </header>
 
-      <div>
+      <main>
         {/* Define the routes for Login and Pokemon List */}
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/user/:username" element={<UserPage />} />
         </Routes>
-      </div>
 
-      <Routes>
-        <Route path="/" element={<PokemonList />} />
-        <Route
-          path="/pokemon/:name"
-          element={<PokemonPage />}
-        />
-      </Routes>
+        <Routes>
+          <Route path="/" element={<PokemonList />} />
+          <Route path="/pokemon/:name" element={<PokemonPage />} />
+        </Routes>
 
-      <Routes>
-        <Route path="/register" element={<RegisterPage />} />
-      </Routes>
+        <Routes>
+          <Route path="/register" element={<RegisterPage />} />
+        </Routes>
+      </main>
+
+      <footer className="footer" style={{ position: 'fixed', bottom: 0, width: '100%', backgroundColor: '#343a40', color: 'white', textAlign: 'center', padding: '1rem' }}>
+        <p>&copy; 2024 Pokémon Finder. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
