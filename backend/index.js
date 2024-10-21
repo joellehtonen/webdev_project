@@ -47,7 +47,7 @@ app.get('/users/:id', async (req, res) => {
 });
 
 // Get username by authtoken
-app.post('/get_user_by_token', authMiddleware, async (req, res) => {
+app.get('/get_user_by_token', authMiddleware, async (req, res) => {
 	console.log(req.user.id);
 	const userId = req.user.id;
 	try {
@@ -57,7 +57,7 @@ app.post('/get_user_by_token', authMiddleware, async (req, res) => {
 		}
 		res.json(result.rows[0]);
 	}
-	catch (err) {
+	catch (err) { 
 		console.error(err);
 		res.status(500).json({error: "Internal server error"})
 	}
