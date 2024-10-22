@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"
 
 const PokemonPage = () => {
     const { name } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
     const [pokemon, setPokemon] = useState(null);
     const [error, setError] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -12,6 +14,15 @@ const PokemonPage = () => {
     const [liked, setLiked] = useState(false);
     const [likeMessage, setLikeMessage] = useState(''); // State for error messages
     const [unlikeMessage, setUnlikeMessage] = useState(''); // State for success messages
+    const currentPage = location.state?.currentPage || JSON.parse(localStorage.getItem('currentPage')) || 1;
+
+    console.log('Current page in storage', currentPage);
+
+    useEffect(() => {
+        if (currentPage) {
+            localStorage.setItem('currentPage', JSON.stringify(currentPage));
+        }
+    }, [currentPage]);
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
@@ -98,11 +109,17 @@ const PokemonPage = () => {
         }
     };
 
+    const handleReturn = () => {
+        navigate('/', {state: {currentPage}});
+        console.log('current page is', currentPage);
+    }
+
     if (error) return <div>Error: {error}</div>;
     if (!pokemon) return <div>Loading...</div>;
 
     return (
         <div>
+            <button onClick={handleReturn} className="back-button">Back to List</button>
             <h1 className="text-4xl font-bold pt-4">
                 {name.charAt(0).toUpperCase() + name.slice(1)}
             </h1>
@@ -129,7 +146,6 @@ const PokemonPage = () => {
                     return (
                         <div className="flex items-stretch" style={{ width: "500px" }} key={statName}>
                             <h3 className="p-3 w-2/4">{`${statName}: ${statValue}`}</h3>
-                            {/* Simple representation of progress, you can replace this with a better visual if needed */}
                             <div style={{ backgroundColor: 'lightgray', width: '100%', height: '20px', borderRadius: '5px' }}>
                                 <div style={{ backgroundColor: 'green', width: `${statValue}px`, height: '100%', borderRadius: '5px' }} />
                             </div>

@@ -1,21 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './pokemonList.css';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const PokemonList = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
     const [pokemonList, setPokemon] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredList, setFilteredList] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(() => {
+        const savedPage = location.state?.currentPage || localStorage.getItem('currentPage');
+        return savedPage ? JSON.parse(savedPage) : 1;
+    });
     const itemsPerPage = 50;
     const [users, setUsers] = useState([]);
     const [userSearchQuery, setUserSearchQuery] = useState('');
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [showTypeDropdown, setShowTypeDropdown] = useState(false);
     const [types, setTypes] = useState([]);
+
+    console.log('Current page before funcs', currentPage);
+
+    useEffect(() => {
+        if (currentPage) {
+            localStorage.setItem('currentPage', JSON.stringify(currentPage));
+        }
+    }, [currentPage]);
+
+    // Go to Pokemon page
+    const goToPokemonPage = (poke) => {
+        console.log(`Clicked on Pokemon: ${poke.name}, current page stored: ${currentPage}`);
+        navigate(`/pokemon/${poke.name}`, { state: {currentPage}});
+    }
 
     // Fetch Pokémon data
     useEffect(() => {
@@ -30,7 +49,6 @@ const PokemonList = () => {
                 setLoading(false);
             }
         };
-
         fetchPokemon();
     }, []);
 
@@ -112,12 +130,20 @@ const PokemonList = () => {
     const paginatedList = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const goToNextPage = () => {
-        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+        if (currentPage < totalPages) {
+            const newPage = currentPage + 1;
+            setCurrentPage(newPage);
+        }
     };
 
     const goToPreviousPage = () => {
-        if (currentPage > 1) setCurrentPage(currentPage - 1);
+        if (currentPage > 1) {
+            const newPage = currentPage - 1;
+            setCurrentPage(newPage);
+        }
     };
+
+    console.log('Current page after funcs:', currentPage);
 
     return (
         <div>
@@ -133,14 +159,13 @@ const PokemonList = () => {
             {filteredUsers.length > 0 && (
                 <div className="dropdown-list">
                     {filteredUsers.map((user) => (
-                        <Link
+                        <div
                             key={user.id}
-                            to={`/users/${user.id}`} // Link to user detail page
-                            className="dropdown-item" // Class for styling
-                            onClick={() => setUserSearchQuery('')} // Clear the search query on click
+                            onClick={() => navigate(`/users/${user.id}`)}
+                            className="dropdown-item"
                         >
                             {user.username}
-                        </Link>
+                        </div>
                     ))}
                 </div>
             )}
@@ -150,17 +175,13 @@ const PokemonList = () => {
             {showTypeDropdown && types.length > 0 && (
                 <div className="dropdown-list">
                     {types.map((type) => (
-                        <Link
+                        <div
                             key={type.name}
-                            /*to={`/pokemon/type/${type.name}`}*/
+                            onClick={() => filterByType(type.name)}
                             className="dropdown-item"
-                            onClick={() => //{
-                                //setShowTypeDropdown(false); // Hide dropdown after selection
-                                filterByType(type.name)
-                            }//}
                         >
                             {type.name.charAt(0).toUpperCase() + type.name.slice(1)} {/* Capitalize first letter */}
-                        </Link>
+                        </div>
                     ))}
                 </div>
             )}
@@ -172,13 +193,12 @@ const PokemonList = () => {
                 onChange={(e) => setUserSearchQuery(e.target.value)}
                 className="border rounded p-2 mb-4"
             />
-
             <div className="pokemon-grid">
                 {paginatedList.map((poke) => (
                     <div className="pokemon-card" key={poke.name}>
-                        <Link to={`/pokemon/${poke.name}`}>
+                        <div onClick={() => goToPokemonPage(poke)} style={{ cursor: 'pointer' }}>
                             <h3>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3>
-                        </Link>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -190,5 +210,4 @@ const PokemonList = () => {
         </div>
     );
 };
-
 export default PokemonList;

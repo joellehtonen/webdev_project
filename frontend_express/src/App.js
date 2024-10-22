@@ -2,9 +2,9 @@
 // src/App.js
 
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom'; // Import Link here
+import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom'; // Import Link here
 import PokemonList from './pokemonList'; // Adjust the import path as necessary
-import RegisterForm from './registerForm';//
+//import RegisterForm from './registerForm';//
 import RegisterPage from './registerPage';//
 import LoginPage from './loginForm';
 import UserPage from './userPage';
@@ -17,6 +17,11 @@ function App() {
   const [userName, setUserName] = useState('');
   const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(() => {
+    const savedPage = localStorage.getItem('currentPage');
+    console.log('Saved page is ', savedPage);
+    return savedPage ? JSON.parse(savedPage) : 1;
+  });
 
   useEffect(() => {
     // Check login status in localStorage
@@ -24,13 +29,19 @@ function App() {
     if (token/* && !IsTokenExpired(token)*/) {
       setIsLoggedIn(!!token); // Set isLoggedIn based on token presence
       fetchUserData(token);
-      console.log("Logged in as", userName); // Checking if the username is logged correctly
     } else {
       localStorage.removeItem('auth_token');
       setIsLoggedIn(false);
       setUserName('');
+      setUserId(null);
     }
 }, [location]); // Re-run effect when location (route) changes
+
+useEffect(() => {
+  localStorage.setItem('currentPage', JSON.stringify(currentPage));
+}, [currentPage]);
+
+console.log('currentPage IN APP.JS IS ', currentPage);
 
 const fetchUserData = async (token) => {
   try {
@@ -41,6 +52,7 @@ const fetchUserData = async (token) => {
       const { username, id: userId } = await response.json();
       setUserName(username);
       setUserId(userId);
+      console.log("Logged in as", response.data.username); // Logging username
   }
   catch (error) {
     console.error("Failed to fetch username: ", error);
@@ -49,6 +61,11 @@ const fetchUserData = async (token) => {
     setUserName('');
     setUserId(null);
   }
+}
+
+const handlePage = (page) => {
+  setCurrentPage(page);
+  navigate(`/${page}`);
 }
 
 const handleLogout = () => {
@@ -70,60 +87,47 @@ const handleLogout = () => {
           <RegisterForm />
         </div>
       )*/}
-      
       <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
         <div className="container align-items-center">
           <div className="navbar-header">
-            <a className="navbar-brand" href="/">Pokémon Finder</a>
+            <button className="navbar-brand" onClick={() => navigate('/')}>Pokémon Finder</button>
           </div>
           <ul className="navbar-nav">
-            { isLoggedIn
-              ? 
-              /* Show Logout button if logged in */
+            {isLoggedIn ? (
               <>
                 <li className="nav-item">
-                <Link className="nav-link" to={`/user/${userId}`}>{userName}'s Home</Link>
+                <button className="nav-link" onClick={() => handlePage(userId)}>{userName}'s Home</button>
                 </li>
                 <li className="nav-item">
                   <button className="nav-link" onClick={handleLogout}>Logout</button>
                 </li>
               </>
-              :
+            ) : (
               <>
-              <li className="nav-item">
-                <a className="nav-link" href="/login">Sign in</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="/register">Register</a>
-              </li>
+                <li className="nav-item">
+                  <button className="nav-link" onClick={() => navigate('/login')}>Sign in</button>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link" onClick={() => navigate('/register')}>Register</button>
+                </li>
               </>
-            }
+            )}
           </ul>
         </div>
       </nav>
 
       <div>
-        {/* Define the routes for Login and Pokemon List */}
         <Routes>
+          <Route path="/" element={<PokemonList currentPage={currentPage}/>} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/user/:username" element={<UserPage/>} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/user/:username" element={<UserPage />} />
+          <Route path="/pokemon/:name" element={<PokemonPage currentPage={currentPage} />} />
         </Routes>
       </div>
-
-      <Routes>
-        <Route path="/" element={<PokemonList />} />
-        <Route
-          path="/pokemon/:name"
-          element={<PokemonPage />}
-        />
-      </Routes>
-
-      <Routes>
-        <Route path="/register" element={<RegisterPage />} />
-      </Routes>
     </div>
   );
-}
+};
 
 function AppWrapper() {
   return (
