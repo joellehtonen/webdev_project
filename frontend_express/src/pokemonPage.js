@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"
@@ -11,8 +11,8 @@ const PokemonPage = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userId, setUserId] = useState(null);
     const [liked, setLiked] = useState(false);
-    const [likeMessage, setLikeMessage] = useState(''); // State for error messages
-    const [unlikeMessage, setUnlikeMessage] = useState(''); // State for success messages
+    const [likeMessage, setLikeMessage] = useState('');
+    const [unlikeMessage, setUnlikeMessage] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
     const [pokemonList, setPokemonList] = useState([]);
@@ -20,7 +20,6 @@ const PokemonPage = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
-        //console.log(token)
         if (token && token.split('.').length === 3) { // Check if it has 3 parts
             setIsLoggedIn(true);
             const decodedToken = jwtDecode(token);
@@ -31,37 +30,34 @@ const PokemonPage = () => {
         }
     }, []);
 
-    const fetchPokemonPage = useCallback(async () => { 
-        
-        try {
-            const response = await axios.get(`http://localhost:5000/pokemon?name=${encodeURIComponent(name)}`)
-            setPokemon(response.data);
-            setCurrentId(response.data.id);
-            setPokemonList(location.state?.pokemonList || []);
-            setError(null)
-            if (isLoggedIn && userId) {
-                const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
-                const userLikes = likesResponse.data;
-                const isLiked = userLikes.some(like => like.pokemon_id === response.data.id);
-                setLiked(isLiked);
-            }
-
-        } catch (err) {
-            console.error(err);
-            setError(err.response ? err.response.data.message : "An unknown error occurred");
-        }
-    }, [name, isLoggedIn, userId])
-
     useEffect(() => {
-        fetchPokemonPage();
-    }, [fetchPokemonPage]) 
+        const fetchPokemonPage = async () => { 
+            try {
+                const response = await axios.get(`http://localhost:5000/pokemon?name=${encodeURIComponent(name)}`)
+                setPokemon(response.data);
+                setCurrentId(response.data.id);
+                setPokemonList(location.state?.pokemonList || []);
+                setError(null)
+                if (isLoggedIn && userId) {
+                    const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
+                    const userLikes = likesResponse.data;
+                    const isLiked = userLikes.some(like => like.pokemon_id === response.data.id);
+                    setLiked(isLiked);
+                }
+
+            } catch (err) {
+                console.error(err);
+                setError(err.response ? err.response.data.message : "An unknown error occurred");
+            }
+        }
+        fetchPokemonPage()
+    }, [name, isLoggedIn, userId])
 
     const handleLike = async () => {
         if (!isLoggedIn) {
             alert('Please log in to like Pokémon.');
             return;
         }
-        
         try {
             if (liked) {
                 // Unlike the Pokémon
@@ -96,7 +92,6 @@ const PokemonPage = () => {
                 setTimeout(() => {
                     setLikeMessage('');
                 }, 2000);
-                //alert(`Liked Pokémon ID: ${pokemon.id}`);
             }
         } catch (error) {
             console.error('Error handling like/unlike:', error);
@@ -144,7 +139,7 @@ const PokemonPage = () => {
             </h1>
             <img
                 src={pokemon.sprites.other['official-artwork'].front_default}
-                alt={`Picture of ${pokemon.name}`}
+                alt={pokemon.name}
                 width={200}
                 height={200}
             />
@@ -163,7 +158,7 @@ const PokemonPage = () => {
                     const statValue = statObject.base_stat;
 
                     return (
-                        <div className="flex items-stretch" style={{ width: "500px" }} key={statName}>
+                        <div className="flex items-stretch" style={{ width: "500px", marginBottom: "20px" }} key={statName}>
                             <h3 className="p-3 w-2/4">{`${statName}: ${statValue}`}</h3>
                             <div style={{ backgroundColor: 'lightgray', width: '100%', height: '20px', borderRadius: '5px' }}>
                                 <div style={{ backgroundColor: 'green', width: `${statValue}px`, height: '100%', borderRadius: '5px' }} />

@@ -14,6 +14,10 @@
     text-align: center; /* Centered text */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     transition: transform 0.2s; /* Animation for hover effect */
+    /*min-height: 100px; /* Set a minimum height for cards */
+    display: flex; /* Use flexbox to align content */
+    flex-direction: column; /* Stack content vertically */
+    justify-content: center; /* Center content vertically */
 }
 
 .pokemon-card:hover {
@@ -40,4 +44,11 @@
 
 .dropdown-item:hover {
     background-color: #f0f0f0; /* Highlight on hover */
+}
+
+.pagination {
+    display: flex; /* Flex layout for pagination */
+    justify-content: center; /* Center the buttons */
+    margin-top: 20px; /* Space above pagination */
+    padding-bottom: 20px; /* Space below pagination to footer */
 }

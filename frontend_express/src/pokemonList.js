@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import './pokemonList.css';
 import { Link, useLocation, useNavigate} from 'react-router-dom';
@@ -22,9 +22,22 @@ const PokemonList = () => {
     const location = useLocation();
     const { currentPage: initialPage } = location.state || { currentPage: 1 };  // Default to page 1 if no state is passed
     const [currentPage, setCurrentPage] = useState(initialPage);
-    // const initialPage = new URLSearchParams(location.search).get('page') || 1; 
-    // const [currentPage, setCurrentPage] = useState(Number(initialPage));
-    const navigate = useNavigate();
+
+    console.log(`1st console.log ${currentPage}`)
+
+    const sortPokemons = useCallback((list) => {
+        return [...list].sort((a, b) => {
+            const nameA = a.name.toLowerCase();
+            const nameB = b.name.toLowerCase();
+    
+            if (sortAZ && !sortZA) {
+                return nameA.localeCompare(nameB);
+            } else if (sortZA && !sortAZ) {
+                return nameB.localeCompare(nameA);
+            }
+            return 0;
+        });
+    }, [sortAZ, sortZA]);
 
     // Fetch Pokémon data
     useEffect(() => {
@@ -42,36 +55,31 @@ const PokemonList = () => {
         fetchPokemon();
     }, []);
 
-    // useEffect(() => {
-    //     navigate(`?page=${currentPage}`, { replace: true });
-    // }, [currentPage, navigate]);
-
     // Filter Pokémon based on search query
     useEffect(() => {
         let filtered = pokemonList;
-
+    
         if (selectedType) {
-            filtered = typeFilteredList
+            filtered = typeFilteredList;
         }
-
+    
         if (searchQuery) {
             filtered = filtered.filter(pokemon =>
                 pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
-
-        // Sort if checkboxes are checked
+    
         if (sortAZ || sortZA) {
             filtered = sortPokemons(filtered);
         }
-
+    
         setFilteredList(filtered);
         setCurrentPage(initialPage);
         if (searchQuery) {
-            setCurrentPage(1)
+            setCurrentPage(1);
         }
-    }, [searchQuery, pokemonList, sortAZ, sortZA]);
-
+    }, [searchQuery, pokemonList, sortAZ, sortZA, sortPokemons, typeFilteredList, selectedType, initialPage]);
+    
     // Fetch users data
     useEffect(() => {
         const token = localStorage.getItem('auth_token')
@@ -144,21 +152,7 @@ const PokemonList = () => {
         } catch (err) {
             setError(`Failed to fetch pokemon by type`)
         }
-    }
-
-    const sortPokemons = (list) => {
-        return [...list].sort((a, b) => {
-            const nameA = a.name.toLowerCase()
-            const nameB = b.name.toLowerCase()
-
-            if (sortAZ && !sortZA) {
-                return nameA.localeCompare(nameB);
-            } else if (sortZA && !sortAZ) {
-                return nameB.localeCompare(nameA);
-            }
-            return 0
-        })
-    }
+    }   
 
     // Update sorting states
     const handleSortAZ = () => {
@@ -189,11 +183,6 @@ const PokemonList = () => {
 
     const goToPreviousPage = () => {
         if (currentPage > 1) setCurrentPage(currentPage - 1);
-    };
-
-    const goToPokemonPage = (poke) => {
-        console.log(`Clicked on Pokemon: ${poke.name}, current page stored: ${currentPage}`);
-        navigate(`/pokemon/${poke.name}`, { state: { currentPage, pokemonList: filteredList } });
     };
 
     return (
@@ -280,10 +269,14 @@ const PokemonList = () => {
             <div className="pokemon-grid">
                 {paginatedList.map((poke) => (
                     <div className="pokemon-card" key={poke.name}>
-                    <div onClick={() => goToPokemonPage(poke)} style={{ cursor: 'pointer' }}>
-                        <h3>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3>
+                        <Link
+                            to={`/pokemon/${poke.name}`}
+                            state={{ currentPage, pokemonList: filteredList}} // Pass the currentPage state here
+                            style={{ textDecoration: 'none', }}
+                        >
+                            <h3 style={{ fontSize: '24px' }}>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3>
+                        </Link>
                     </div>
-                </div>
                 ))}
             </div>
             <div className="pagination">

@@ -31,7 +31,7 @@ function App() {
       setUserName('');
       setUserId(null);
     }
-}, [location]); // Re-run effect when location (route) changes
+}, [location, userName]); // Re-run effect when location (route) changes
 
 const fetchUserData = async (token) => {
   try {
@@ -110,7 +110,7 @@ const handleLogout = () => {
         </Routes>
       </main>
 
-      <footer className="footer" style={{ position: 'fixed', bottom: 0, width: '100%', backgroundColor: '#343a40', color: 'white', textAlign: 'center', padding: '1rem' }}>
+      <footer className="footer" style={{ position: 'relative', bottom: 0, width: '100%', backgroundColor: '#343a40', color: 'white', textAlign: 'center', padding: '20px' }}>
         <p>&copy; 2024 Pokémon Finder. All rights reserved.</p>
       </footer>
     </div>
