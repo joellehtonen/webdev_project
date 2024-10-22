@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom'; // Import Link here
 import PokemonList from './pokemonList'; // Adjust the import path as necessary
-import RegisterForm from './registerForm';//
+//import RegisterForm from './registerForm';//
 import RegisterPage from './registerPage';//
 import LoginPage from './loginForm';
 import UserPage from './userPage';
@@ -30,7 +30,7 @@ function App() {
       setIsLoggedIn(false);
       setUserName('');
     }
-}, [location]); // Re-run effect when location (route) changes
+}, [location, userName]); // Re-run effect when location (route) changes
 
 const fetchUserData = async (token) => {
   try {
@@ -109,7 +109,7 @@ const handleLogout = () => {
 
       </main>
 
-      <footer className="footer" style={{ position: 'fixed', bottom: 0, width: '100%', backgroundColor: '#343a40', color: 'white', textAlign: 'center', padding: '1rem' }}>
+      <footer className="footer" style={{ position: 'relative', bottom: 0, width: '100%', backgroundColor: '#343a40', color: 'white', textAlign: 'center', padding: '20px' }}>
         <p>&copy; 2024 Pokémon Finder. All rights reserved.</p>
       </footer>
     </div>
