@@ -229,7 +229,7 @@ const PokemonList = () => {
                     {filteredUsers.map((user) => (
                         <Link
                             key={user.id}
-                            to={`/users/${user.id}`} // Link to user detail page
+                            to={`/user/${user.id}`} // Link to user detail page
                             className="dropdown-item" // Class for styling
                             onClick={() => setUserSearchQuery('')} // Clear the search query on click
                         >
