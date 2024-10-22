@@ -16,12 +16,8 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [userId, setUserId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(() => {
-    const savedPage = localStorage.getItem('currentPage');
-    console.log('Saved page is ', savedPage);
-    return savedPage ? JSON.parse(savedPage) : 1;
-  });
 
   useEffect(() => {
     // Check login status in localStorage
@@ -37,36 +33,24 @@ function App() {
     }
 }, [location]); // Re-run effect when location (route) changes
 
-useEffect(() => {
-  localStorage.setItem('currentPage', JSON.stringify(currentPage));
-}, [currentPage]);
-
-console.log('currentPage IN APP.JS IS ', currentPage);
-
 const fetchUserData = async (token) => {
   try {
-    const response = await fetch(`http://localhost:5000/get_user_by_token`,
-      {
-        headers: {'Authorization': `Bearer ${token}`},
-      });
-      const { username, id: userId } = await response.json();
-      setUserName(username);
-      setUserId(userId);
-      console.log("Logged in as", response.data.username); // Logging username
-  }
-  catch (error) {
+    const response = await fetch(`http://localhost:5000/get_user_by_token`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+
+    const data = await response.json(); // Parse JSON directly from response
+      setUserName(data.username);
+      setUserId(data.id);
+      console.log("Logged in as", data.username); // Logging username
+  } catch (error) {
     console.error("Failed to fetch username: ", error);
     localStorage.removeItem('auth_token');
     setIsLoggedIn(false);
     setUserName('');
     setUserId(null);
   }
-}
-
-const handlePage = (page) => {
-  setCurrentPage(page);
-  navigate(`/${page}`);
-}
+};
 
 const handleLogout = () => {
     // Clear the login state and token
@@ -82,7 +66,11 @@ const handleLogout = () => {
         <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
           <div className="container align-items-center">
             <div className="navbar-header">
-            <button className="navbar-brand" onClick={() => navigate('/')}>Pokémon Finder</button>
+            <button className="navbar-brand" onClick={() => {
+                  navigate('/');
+                  // window.location.reload();
+                }}
+              >Pokémon Finder</button>
             </div>
             <ul className="navbar-nav">
               { isLoggedIn
@@ -90,7 +78,7 @@ const handleLogout = () => {
                 /* Show Logout button if logged in */
                 <>
                   <li className="nav-item">
-                  <button className="nav-link text-capitalize" onClick={() => handlePage(userId)}>{userName}'s Home</button>
+                  <button className="nav-link text-capitalize" onClick={() => navigate(`/${userId}`)}>{userName}'s Home</button>
                   </li>
                   <li className="nav-item">
                     <button className="nav-link" onClick={handleLogout}>Logout</button>
@@ -114,11 +102,11 @@ const handleLogout = () => {
       <main>
         {/* Define the routes for Login and Pokemon List */}
         <Routes>
-          <Route path="/" element={<PokemonList currentPage={currentPage}/>} />
+          <Route path="/" element={<PokemonList />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/user/:username" element={<UserPage />} />
-          <Route path="/pokemon/:name" element={<PokemonPage currentPage={currentPage} />} />
+          <Route path="/pokemon/:name" element={<PokemonPage />} />
         </Routes>
       </main>
 

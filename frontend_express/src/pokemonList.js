@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './pokemonList.css';
-import { Link, useLocation, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate} from 'react-router-dom';
 
 const PokemonList = () => {
     const [pokemonList, setPokemon] = useState([]);
@@ -22,6 +22,9 @@ const PokemonList = () => {
     const location = useLocation();
     const { currentPage: initialPage } = location.state || { currentPage: 1 };  // Default to page 1 if no state is passed
     const [currentPage, setCurrentPage] = useState(initialPage);
+    // const initialPage = new URLSearchParams(location.search).get('page') || 1; 
+    // const [currentPage, setCurrentPage] = useState(Number(initialPage));
+    const navigate = useNavigate();
 
     // Fetch Pokémon data
     useEffect(() => {
@@ -38,6 +41,10 @@ const PokemonList = () => {
         };
         fetchPokemon();
     }, []);
+
+    // useEffect(() => {
+    //     navigate(`?page=${currentPage}`, { replace: true });
+    // }, [currentPage, navigate]);
 
     // Filter Pokémon based on search query
     useEffect(() => {
@@ -64,8 +71,6 @@ const PokemonList = () => {
             setCurrentPage(1)
         }
     }, [searchQuery, pokemonList, sortAZ, sortZA]);
-
-    console.log(`console.log in search bar ${currentPage}`)
 
     // Fetch users data
     useEffect(() => {
@@ -179,20 +184,17 @@ const PokemonList = () => {
     const paginatedList = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const goToNextPage = () => {
-        if (currentPage < totalPages) {
-            const newPage = currentPage + 1;
-            setCurrentPage(newPage);
-        }
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     };
 
     const goToPreviousPage = () => {
-        if (currentPage > 1) {
-            const newPage = currentPage - 1;
-            setCurrentPage(newPage);
-        }
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
     };
 
-    console.log('Current page after funcs:', currentPage);
+    const goToPokemonPage = (poke) => {
+        console.log(`Clicked on Pokemon: ${poke.name}, current page stored: ${currentPage}`);
+        navigate(`/pokemon/${poke.name}`, { state: { currentPage, pokemonList: filteredList } });
+    };
 
     return (
         <div>
@@ -285,6 +287,9 @@ const PokemonList = () => {
                 ))}
             </div>
             <div className="pagination">
+                {/* <button onClick={goToPreviousPage} disabled={currentPage === 1}>Previous</button>
+                <span>{currentPage} / {totalPages}</span>
+                <button onClick={goToNextPage} disabled={currentPage === totalPages}>Next</button> */}
                 <button onClick={goToPreviousPage}>Previous</button>
                 <span>{`Page ${currentPage} of ${totalPages}`}</span>
                 <button onClick={goToNextPage}>Next</button>

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"
+import PokemonList from "./pokemonList";
 
 const PokemonPage = () => {
     const { name } = useParams();
@@ -14,6 +15,8 @@ const PokemonPage = () => {
     const [unlikeMessage, setUnlikeMessage] = useState(''); // State for success messages
     const navigate = useNavigate();
     const location = useLocation();
+    const [pokemonList, setPokemonList] = useState([]);
+    const [currentId, setCurrentId] = useState(null);
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
@@ -33,8 +36,9 @@ const PokemonPage = () => {
         try {
             const response = await axios.get(`http://localhost:5000/pokemon?name=${encodeURIComponent(name)}`)
             setPokemon(response.data);
+            setCurrentId(response.data.id);
+            setPokemonList(location.state?.pokemonList || []);
             setError(null)
-
             if (isLoggedIn && userId) {
                 const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
                 const userLikes = likesResponse.data;
@@ -100,24 +104,41 @@ const PokemonPage = () => {
         }
     };
 
-    const handleReturn = () => {
-        navigate('/', {state: {currentPage}});
-        console.log('current page is', currentPage);
-    }
-
     if (error) return <div>Error: {error}</div>;
     if (!pokemon) return <div>Loading...</div>;
 
     const { currentPage } = location.state || { currentPage: 1 };
 
-    console.log(currentPage)
+    console.log('list length is ', pokemonList.length);
+
+    const handleNavigation = (direction) => {
+        const currentIndex = pokemonList.findIndex(p => p.name === pokemon.name); // Get current index
+        let nextIndex = currentIndex;
+        if (direction === 'next') {
+            nextIndex = (currentIndex + 1) % pokemonList.length;
+        } else if (direction === 'prev') {
+            nextIndex = (currentIndex - 1 + pokemonList.length) % pokemonList.length;
+        }
+        const nextPokemonName = pokemonList[nextIndex]?.name;
+        if (nextPokemonName) {
+            navigate(`/pokemon/${nextPokemonName}`, { state: {pokemonList}});
+        }
+    };
 
     return (
         <div>
             {/* Back button navigates to the list and maintains the page */}
-            <button onClick={() => navigate('/', { state: { currentPage } })}>
+            <button onClick={() => navigate(`/?page=${currentPage}`, { state: { currentPage } })}>
                 Back to Pokémon List
             </button>
+            <div>
+            <button onClick={() => handleNavigation('prev')} disabled={pokemonList.length <= 1}>
+                Previous Pokémon
+            </button>
+            <button onClick={() => handleNavigation('next')} disabled={pokemonList.length <= 1}>
+                Next Pokémon
+            </button>
+            </div>
             <h1 className="text-4xl font-bold pt-4">
                 {name.charAt(0).toUpperCase() + name.slice(1)}
             </h1>
