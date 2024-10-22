@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import './pokemonList.css';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate} from 'react-router-dom';
 
 const PokemonList = () => {
     const [pokemonList, setPokemon] = useState([]);
@@ -9,7 +9,6 @@ const PokemonList = () => {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredList, setFilteredList] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 50;
     const [users, setUsers] = useState([]);
     const [userSearchQuery, setUserSearchQuery] = useState('');
@@ -19,6 +18,26 @@ const PokemonList = () => {
     const [selectedType, setSelectedType] = useState(null)
     const [sortAZ, setSortAZ] = useState(false); // A-Z checkbox
     const [sortZA, setSortZA] = useState(false); // Z-A checkbox
+    const [typeFilteredList, setTypeFilteredList] = useState([]);
+    const location = useLocation();
+    const { currentPage: initialPage } = location.state || { currentPage: 1 };  // Default to page 1 if no state is passed
+    const [currentPage, setCurrentPage] = useState(initialPage);
+
+    console.log(`1st console.log ${currentPage}`)
+
+    const sortPokemons = useCallback((list) => {
+        return [...list].sort((a, b) => {
+            const nameA = a.name.toLowerCase();
+            const nameB = b.name.toLowerCase();
+    
+            if (sortAZ && !sortZA) {
+                return nameA.localeCompare(nameB);
+            } else if (sortZA && !sortAZ) {
+                return nameB.localeCompare(nameA);
+            }
+            return 0;
+        });
+    }, [sortAZ, sortZA]);
 
     // Fetch Pokémon data
     useEffect(() => {
@@ -33,29 +52,34 @@ const PokemonList = () => {
                 setLoading(false);
             }
         };
-
         fetchPokemon();
     }, []);
 
     // Filter Pokémon based on search query
     useEffect(() => {
         let filtered = pokemonList;
-
+    
+        if (selectedType) {
+            filtered = typeFilteredList;
+        }
+    
         if (searchQuery) {
             filtered = filtered.filter(pokemon =>
                 pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
-
-        // Sort if checkboxes are checked
+    
         if (sortAZ || sortZA) {
             filtered = sortPokemons(filtered);
         }
-
+    
         setFilteredList(filtered);
-        setCurrentPage(1);
-    }, [searchQuery, pokemonList, sortAZ, sortZA]);
-
+        setCurrentPage(initialPage);
+        if (searchQuery) {
+            setCurrentPage(1);
+        }
+    }, [searchQuery, pokemonList, sortAZ, sortZA, sortPokemons, typeFilteredList, selectedType, initialPage]);
+    
     // Fetch users data
     useEffect(() => {
         const token = localStorage.getItem('auth_token')
@@ -103,9 +127,11 @@ const PokemonList = () => {
         setSearchQuery('')
         if (type === 'all') {
             setFilteredList(sortPokemons(pokemonList))
+            setTypeFilteredList(pokemonList)
             setSelectedType(null)
             setShowTypeDropdown(false)
             setCurrentPage(1)
+            console.log(`console.log in type all ${currentPage}`)
             return;
         }
         try {
@@ -116,28 +142,17 @@ const PokemonList = () => {
                 url: p.pokemon.url,
                 types: p.pokemon.types
             }))
-            setFilteredList(sortPokemons(pokemonByType))
+            const sortedPokemons = sortPokemons(pokemonByType);
+            setFilteredList(sortedPokemons)
+            setTypeFilteredList(sortedPokemons)
             setShowTypeDropdown(false)
             setCurrentPage(1)
+            console.log(`console.log in type filtered ${currentPage}`)
             setSelectedType(type)
         } catch (err) {
             setError(`Failed to fetch pokemon by type`)
         }
-    }
-
-    const sortPokemons = (list) => {
-        return [...list].sort((a, b) => {
-            const nameA = a.name.toLowerCase()
-            const nameB = b.name.toLowerCase()
-
-            if (sortAZ && !sortZA) {
-                return nameA.localeCompare(nameB);
-            } else if (sortZA && !sortAZ) {
-                return nameB.localeCompare(nameA);
-            }
-            return 0
-        })
-    }
+    }   
 
     // Update sorting states
     const handleSortAZ = () => {
@@ -182,7 +197,7 @@ const PokemonList = () => {
 
             {/* Pokémon Types Dropdown */}
             <button onClick={() => setShowTypeDropdown(prev => !prev)}>
-                {selectedType ? `Filter by ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}` : 'Pokemon Types'}
+                {selectedType ? `Filter by ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}` : 'Pokémon Types'}
             </button>
             {showTypeDropdown && types.length > 0 && (
                 <div className="dropdown-list">
@@ -210,11 +225,11 @@ const PokemonList = () => {
 
             {/* User Dropdown List */}
             {filteredUsers.length > 0 && (
-                <div className="dropdown-list">
+                <div className="dropdown-list dropdown-right">
                     {filteredUsers.map((user) => (
                         <Link
                             key={user.id}
-                            to={`/users/${user.id}`} // Link to user detail page
+                            to={`/user/${user.id}`} // Link to user detail page
                             className="dropdown-item" // Class for styling
                             onClick={() => setUserSearchQuery('')} // Clear the search query on click
                         >
@@ -229,11 +244,11 @@ const PokemonList = () => {
                 placeholder="Search User"
                 value={userSearchQuery}
                 onChange={(e) => setUserSearchQuery(e.target.value)}
-                className="border rounded p-2 mb-4"
+                className="border rounded p-2 mb-4 input-right"
             />
 
             <div>
-                <label>
+            <label style={{ marginRight: '10px' }}>
                     <input
                         type="checkbox"
                         checked={sortAZ}
@@ -254,13 +269,20 @@ const PokemonList = () => {
             <div className="pokemon-grid">
                 {paginatedList.map((poke) => (
                     <div className="pokemon-card" key={poke.name}>
-                        <Link to={`/pokemon/${poke.name}`}>
-                            <h3>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3>
+                        <Link
+                            to={`/pokemon/${poke.name}`}
+                            state={{ currentPage, pokemonList: filteredList}} // Pass the currentPage state here
+                            style={{ textDecoration: 'none', }}
+                        >
+                            <h3 style={{ fontSize: '24px' }}>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3>
                         </Link>
                     </div>
                 ))}
             </div>
             <div className="pagination">
+                {/* <button onClick={goToPreviousPage} disabled={currentPage === 1}>Previous</button>
+                <span>{currentPage} / {totalPages}</span>
+                <button onClick={goToNextPage} disabled={currentPage === totalPages}>Next</button> */}
                 <button onClick={goToPreviousPage}>Previous</button>
                 <span>{`Page ${currentPage} of ${totalPages}`}</span>
                 <button onClick={goToNextPage}>Next</button>
@@ -268,5 +290,4 @@ const PokemonList = () => {
         </div>
     );
 };
-
 export default PokemonList;

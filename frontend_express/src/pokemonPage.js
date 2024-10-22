@@ -1,7 +1,9 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"
+import PokemonList from "./pokemonList";
+import './pokemonPage.css';
 
 const PokemonPage = () => {
     const { name } = useParams();
@@ -10,12 +12,15 @@ const PokemonPage = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userId, setUserId] = useState(null);
     const [liked, setLiked] = useState(false);
-    const [likeMessage, setLikeMessage] = useState(''); // State for error messages
-    const [unlikeMessage, setUnlikeMessage] = useState(''); // State for success messages
+    const [likeMessage, setLikeMessage] = useState('');
+    const [unlikeMessage, setUnlikeMessage] = useState('');
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [pokemonList, setPokemonList] = useState([]);
+    const [currentId, setCurrentId] = useState(null);
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
-        //console.log(token)
         if (token && token.split('.').length === 3) { // Check if it has 3 parts
             setIsLoggedIn(true);
             const decodedToken = jwtDecode(token);
@@ -26,36 +31,34 @@ const PokemonPage = () => {
         }
     }, []);
 
-    const fetchPokemonPage = useCallback(async () => { 
-        
-        try {
-            const response = await axios.get(`http://localhost:5000/pokemon?name=${encodeURIComponent(name)}`)
-            setPokemon(response.data);
-            setError(null)
-
-            if (isLoggedIn && userId) {
-                const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
-                const userLikes = likesResponse.data;
-                const isLiked = userLikes.some(like => like.pokemon_id === response.data.id);
-                setLiked(isLiked);
-            }
-
-        } catch (err) {
-            console.error(err);
-            setError(err.response ? err.response.data.message : "An unknown error occurred");
-        }
-    }, [name, isLoggedIn, userId])
-
     useEffect(() => {
-        fetchPokemonPage();
-    }, [fetchPokemonPage]) 
+        const fetchPokemonPage = async () => { 
+            try {
+                const response = await axios.get(`http://localhost:5000/pokemon?name=${encodeURIComponent(name)}`)
+                setPokemon(response.data);
+                setCurrentId(response.data.id);
+                setPokemonList(location.state?.pokemonList || []);
+                setError(null)
+                if (isLoggedIn && userId) {
+                    const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
+                    const userLikes = likesResponse.data;
+                    const isLiked = userLikes.some(like => like.pokemon_id === response.data.id);
+                    setLiked(isLiked);
+                }
+
+            } catch (err) {
+                console.error(err);
+                setError(err.response ? err.response.data.message : "An unknown error occurred");
+            }
+        }
+        fetchPokemonPage()
+    }, [name, isLoggedIn, userId])
 
     const handleLike = async () => {
         if (!isLoggedIn) {
             alert('Please log in to like Pokémon.');
             return;
         }
-        
         try {
             if (liked) {
                 // Unlike the Pokémon
@@ -90,7 +93,6 @@ const PokemonPage = () => {
                 setTimeout(() => {
                     setLikeMessage('');
                 }, 2000);
-                //alert(`Liked Pokémon ID: ${pokemon.id}`);
             }
         } catch (error) {
             console.error('Error handling like/unlike:', error);
@@ -101,14 +103,53 @@ const PokemonPage = () => {
     if (error) return <div>Error: {error}</div>;
     if (!pokemon) return <div>Loading...</div>;
 
+    const { currentPage } = location.state || { currentPage: 1 };
+
+    console.log('list length is ', pokemonList.length);
+
+    const handleNavigation = (direction) => {
+        const currentIndex = pokemonList.findIndex(p => p.name === pokemon.name); // Get current index
+        let nextIndex = currentIndex;
+        if (direction === 'next') {
+            nextIndex = (currentIndex + 1) % pokemonList.length;
+        } else if (direction === 'prev') {
+            nextIndex = (currentIndex - 1 + pokemonList.length) % pokemonList.length;
+        }
+        const nextPokemonName = pokemonList[nextIndex]?.name;
+        if (nextPokemonName) {
+            navigate(`/pokemon/${nextPokemonName}`, { state: {currentPage, pokemonList}});
+        }
+    };
+
     return (
         <div>
+            {/* Back button navigates to the list and maintains the page */}
+            <button onClick={() => navigate(`/?page=${currentPage}`, { state: { currentPage } })}>
+                Back to Pokémon List
+            </button>
+            <div>
+            <label style={{ marginRight: '5px', marginTop: '5px'}}>
+            <button onClick={() => handleNavigation('prev')} disabled={pokemonList.length <= 1}>
+                Previous Pokémon
+            </button>
+            </label>
+            <button onClick={() => handleNavigation('next')} disabled={pokemonList.length <= 1}>
+                Next Pokémon
+            </button>
+            </div>
             <h1 className="text-4xl font-bold pt-4">
                 {name.charAt(0).toUpperCase() + name.slice(1)}
             </h1>
+            <div className="types-container">
+                {pokemon.types.map((type) => (
+                    <div key={type.type.name} className={`type-${type.type.name}`} data-type={type.type.name}>
+                        {type.type.name.charAt(0).toUpperCase() + type.type.name.slice(1)}
+                    </div>
+                ))}
+            </div>
             <img
                 src={pokemon.sprites.other['official-artwork'].front_default}
-                alt={`Picture of ${pokemon.name}`}
+                alt={pokemon.name}
                 width={200}
                 height={200}
             />
@@ -127,9 +168,8 @@ const PokemonPage = () => {
                     const statValue = statObject.base_stat;
 
                     return (
-                        <div className="flex items-stretch" style={{ width: "500px" }} key={statName}>
-                            <h3 className="p-3 w-2/4">{`${statName}: ${statValue}`}</h3>
-                            {/* Simple representation of progress, you can replace this with a better visual if needed */}
+                        <div className="flex items-stretch" style={{ width: "250px", marginBottom: "10px" }} key={statName}>
+                            <h3 className="p-3 w-2/4" style={{fontSize: '20px', marginBottom: '-10px'}}>{`${statName}: ${statValue}`}</h3>
                             <div style={{ backgroundColor: 'lightgray', width: '100%', height: '20px', borderRadius: '5px' }}>
                                 <div style={{ backgroundColor: 'green', width: `${statValue}px`, height: '100%', borderRadius: '5px' }} />
                             </div>
