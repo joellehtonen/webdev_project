@@ -78,7 +78,7 @@ const handleLogout = () => {
                 /* Show Logout button if logged in */
                 <>
                   <li className="nav-item">
-                  <button className="nav-link text-capitalize" onClick={() => navigate(`/${userId}`)}>{userName}'s Home</button>
+                  <button className="nav-link text-capitalize" onClick={() => navigate(`/user/${userId}`)}>{userName}'s Home</button>
                   </li>
                   <li className="nav-item">
                     <button className="nav-link" onClick={handleLogout}>Logout</button>
