@@ -16,7 +16,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [userId, setUserId] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,6 +43,7 @@ const fetchUserData = async (token) => {
       setUserName(data.username);
       setUserId(data.id);
       console.log("Logged in as", data.username); // Logging username
+      console.log("ID is", data.id); // Logging username
   } catch (error) {
     console.error("Failed to fetch username: ", error);
     localStorage.removeItem('auth_token');
@@ -105,7 +106,7 @@ const handleLogout = () => {
           <Route path="/" element={<PokemonList />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/user/:username" element={<UserPage />} />
+          <Route path="/user/:userId" element={<UserPage />} />
           <Route path="/pokemon/:name" element={<PokemonPage />} />
         </Routes>
       </main>
