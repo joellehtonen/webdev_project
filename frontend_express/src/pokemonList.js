@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './pokemonList.css';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const PokemonList = () => {
     const [pokemonList, setPokemon] = useState([]);
@@ -9,7 +9,7 @@ const PokemonList = () => {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredList, setFilteredList] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
+    //const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 50;
     const [users, setUsers] = useState([]);
     const [userSearchQuery, setUserSearchQuery] = useState('');
@@ -19,6 +19,12 @@ const PokemonList = () => {
     const [selectedType, setSelectedType] = useState(null)
     const [sortAZ, setSortAZ] = useState(false); // A-Z checkbox
     const [sortZA, setSortZA] = useState(false); // Z-A checkbox
+    const [typeFilteredList, setTypeFilteredList] = useState([]);
+    const location = useLocation();
+    const { currentPage: initialPage } = location.state || { currentPage: 1 };  // Default to page 1 if no state is passed
+    const [currentPage, setCurrentPage] = useState(initialPage);
+
+    console.log(`1st console.log ${currentPage}`)
 
     // Fetch Pokémon data
     useEffect(() => {
@@ -41,6 +47,10 @@ const PokemonList = () => {
     useEffect(() => {
         let filtered = pokemonList;
 
+        if (selectedType) {
+            filtered = typeFilteredList
+        }
+
         if (searchQuery) {
             filtered = filtered.filter(pokemon =>
                 pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -53,8 +63,13 @@ const PokemonList = () => {
         }
 
         setFilteredList(filtered);
-        setCurrentPage(1);
+        setCurrentPage(initialPage);
+        if (searchQuery) {
+            setCurrentPage(1)
+        }
     }, [searchQuery, pokemonList, sortAZ, sortZA]);
+
+    console.log(`console.log in search bar ${currentPage}`)
 
     // Fetch users data
     useEffect(() => {
@@ -103,9 +118,11 @@ const PokemonList = () => {
         setSearchQuery('')
         if (type === 'all') {
             setFilteredList(sortPokemons(pokemonList))
+            setTypeFilteredList(pokemonList)
             setSelectedType(null)
             setShowTypeDropdown(false)
             setCurrentPage(1)
+            console.log(`console.log in type all ${currentPage}`)
             return;
         }
         try {
@@ -116,9 +133,12 @@ const PokemonList = () => {
                 url: p.pokemon.url,
                 types: p.pokemon.types
             }))
-            setFilteredList(sortPokemons(pokemonByType))
+            const sortedPokemons = sortPokemons(pokemonByType);
+            setFilteredList(sortedPokemons)
+            setTypeFilteredList(sortedPokemons)
             setShowTypeDropdown(false)
             setCurrentPage(1)
+            console.log(`console.log in type filtered ${currentPage}`)
             setSelectedType(type)
         } catch (err) {
             setError(`Failed to fetch pokemon by type`)
@@ -254,7 +274,10 @@ const PokemonList = () => {
             <div className="pokemon-grid">
                 {paginatedList.map((poke) => (
                     <div className="pokemon-card" key={poke.name}>
-                        <Link to={`/pokemon/${poke.name}`}>
+                        <Link
+                            to={`/pokemon/${poke.name}`}
+                            state={{ currentPage }} // Pass the currentPage state here
+                        >
                             <h3>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3>
                         </Link>
                     </div>

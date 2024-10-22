@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"
 
@@ -12,6 +12,8 @@ const PokemonPage = () => {
     const [liked, setLiked] = useState(false);
     const [likeMessage, setLikeMessage] = useState(''); // State for error messages
     const [unlikeMessage, setUnlikeMessage] = useState(''); // State for success messages
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
@@ -101,8 +103,16 @@ const PokemonPage = () => {
     if (error) return <div>Error: {error}</div>;
     if (!pokemon) return <div>Loading...</div>;
 
+    const { currentPage } = location.state || { currentPage: 1 };
+
+    console.log(currentPage)
+
     return (
         <div>
+            {/* Back button navigates to the list and maintains the page */}
+            <button onClick={() => navigate('/', { state: { currentPage } })}>
+                Back to Pokémon List
+            </button>
             <h1 className="text-4xl font-bold pt-4">
                 {name.charAt(0).toUpperCase() + name.slice(1)}
             </h1>
