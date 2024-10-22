@@ -31,8 +31,20 @@
     border-radius: 4px;
     z-index: 1000; /* Ensure dropdown appears above other elements */
     max-height: 200px;
+    max-width: 200px;
+    left: 200px; 
     overflow-y: auto; /* Add scroll if too many items */
     width: calc(100% - 16px); /* Match input width, accounting for padding */
+}
+
+.dropdown-right {
+    margin-left: 1200px; 
+    margin-top: -20px;
+ }
+
+.input-right {
+   margin-left: 1050px; 
+   max-width: 600px;
 }
 
 .dropdown-item {

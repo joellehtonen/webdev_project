@@ -197,7 +197,7 @@ const PokemonList = () => {
 
             {/* Pokémon Types Dropdown */}
             <button onClick={() => setShowTypeDropdown(prev => !prev)}>
-                {selectedType ? `Filter by ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}` : 'Pokemon Types'}
+                {selectedType ? `Filter by ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}` : 'Pokémon Types'}
             </button>
             {showTypeDropdown && types.length > 0 && (
                 <div className="dropdown-list">
@@ -225,7 +225,7 @@ const PokemonList = () => {
 
             {/* User Dropdown List */}
             {filteredUsers.length > 0 && (
-                <div className="dropdown-list">
+                <div className="dropdown-list dropdown-right">
                     {filteredUsers.map((user) => (
                         <Link
                             key={user.id}
@@ -244,11 +244,11 @@ const PokemonList = () => {
                 placeholder="Search User"
                 value={userSearchQuery}
                 onChange={(e) => setUserSearchQuery(e.target.value)}
-                className="border rounded p-2 mb-4"
+                className="border rounded p-2 mb-4 input-right"
             />
 
             <div>
-                <label>
+            <label style={{ marginRight: '10px' }}>
                     <input
                         type="checkbox"
                         checked={sortAZ}
