@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"
 import PokemonList from "./pokemonList";
+import './pokemonPage.css';
 
 const PokemonPage = () => {
     const { name } = useParams();
@@ -116,7 +117,7 @@ const PokemonPage = () => {
         }
         const nextPokemonName = pokemonList[nextIndex]?.name;
         if (nextPokemonName) {
-            navigate(`/pokemon/${nextPokemonName}`, { state: {pokemonList}});
+            navigate(`/pokemon/${nextPokemonName}`, { state: {currentPage, pokemonList}});
         }
     };
 
@@ -127,9 +128,11 @@ const PokemonPage = () => {
                 Back to Pokémon List
             </button>
             <div>
+            <label style={{ marginRight: '5px', marginTop: '5px'}}>
             <button onClick={() => handleNavigation('prev')} disabled={pokemonList.length <= 1}>
                 Previous Pokémon
             </button>
+            </label>
             <button onClick={() => handleNavigation('next')} disabled={pokemonList.length <= 1}>
                 Next Pokémon
             </button>
@@ -137,6 +140,13 @@ const PokemonPage = () => {
             <h1 className="text-4xl font-bold pt-4">
                 {name.charAt(0).toUpperCase() + name.slice(1)}
             </h1>
+            <div className="types-container">
+                {pokemon.types.map((type) => (
+                    <div key={type.type.name} className={`type-${type.type.name}`} data-type={type.type.name}>
+                        {type.type.name.charAt(0).toUpperCase() + type.type.name.slice(1)}
+                    </div>
+                ))}
+            </div>
             <img
                 src={pokemon.sprites.other['official-artwork'].front_default}
                 alt={pokemon.name}
@@ -158,8 +168,8 @@ const PokemonPage = () => {
                     const statValue = statObject.base_stat;
 
                     return (
-                        <div className="flex items-stretch" style={{ width: "500px", marginBottom: "20px" }} key={statName}>
-                            <h3 className="p-3 w-2/4">{`${statName}: ${statValue}`}</h3>
+                        <div className="flex items-stretch" style={{ width: "250px", marginBottom: "10px" }} key={statName}>
+                            <h3 className="p-3 w-2/4" style={{fontSize: '20px', marginBottom: '-10px'}}>{`${statName}: ${statValue}`}</h3>
                             <div style={{ backgroundColor: 'lightgray', width: '100%', height: '20px', borderRadius: '5px' }}>
                                 <div style={{ backgroundColor: 'green', width: `${statValue}px`, height: '100%', borderRadius: '5px' }} />
                             </div>
