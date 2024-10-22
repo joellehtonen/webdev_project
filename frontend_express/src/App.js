@@ -78,45 +78,41 @@ const handleLogout = () => {
 
   return (
     <div>
-      {/*<h1>
-        <Link to="/">Pokemon Finder</Link>
-      </h1>*/}
-      {/* Conditionally render RegisterForm if not on the /login route */}
-      {/*!isLoggedIn && location.pathname !== '/login' && (
-        <div>
-          <RegisterForm />
-        </div>
-      )*/}
-      <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
-        <div className="container align-items-center">
-          <div className="navbar-header">
+      <header>
+        <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
+          <div className="container align-items-center">
+            <div className="navbar-header">
             <button className="navbar-brand" onClick={() => navigate('/')}>Pokémon Finder</button>
-          </div>
-          <ul className="navbar-nav">
-            {isLoggedIn ? (
-              <>
-                <li className="nav-item">
-                <button className="nav-link" onClick={() => handlePage(userId)}>{userName}'s Home</button>
-                </li>
-                <li className="nav-item">
-                  <button className="nav-link" onClick={handleLogout}>Logout</button>
-                </li>
-              </>
-            ) : (
-              <>
+            </div>
+            <ul className="navbar-nav">
+              { isLoggedIn
+                ? 
+                /* Show Logout button if logged in */
+                <>
+                  <li className="nav-item">
+                  <button className="nav-link text-capitalize" onClick={() => handlePage(userId)}>{userName}'s Home</button>
+                  </li>
+                  <li className="nav-item">
+                    <button className="nav-link" onClick={handleLogout}>Logout</button>
+                  </li>
+                </>
+                :
+                <>
                 <li className="nav-item">
                   <button className="nav-link" onClick={() => navigate('/login')}>Sign in</button>
                 </li>
                 <li className="nav-item">
                   <button className="nav-link" onClick={() => navigate('/register')}>Register</button>
                 </li>
-              </>
-            )}
-          </ul>
-        </div>
-      </nav>
+                </>
+              }
+            </ul>
+          </div>
+        </nav>
+      </header>
 
-      <div>
+      <main>
+        {/* Define the routes for Login and Pokemon List */}
         <Routes>
           <Route path="/" element={<PokemonList currentPage={currentPage}/>} />
           <Route path="/login" element={<LoginPage />} />
@@ -124,7 +120,11 @@ const handleLogout = () => {
           <Route path="/user/:username" element={<UserPage />} />
           <Route path="/pokemon/:name" element={<PokemonPage currentPage={currentPage} />} />
         </Routes>
-      </div>
+      </main>
+
+      <footer className="footer" style={{ position: 'fixed', bottom: 0, width: '100%', backgroundColor: '#343a40', color: 'white', textAlign: 'center', padding: '1rem' }}>
+        <p>&copy; 2024 Pokémon Finder. All rights reserved.</p>
+      </footer>
     </div>
   );
 };

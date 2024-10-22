@@ -72,4 +72,40 @@ router.get('/', async (req, res) => {
 	}
 });
 
+router.get('/:pokemonId', async (req, res) => {
+	const { pokemonId } = req.params;
+	// if (pokemonId && !isValidInput(pokemonId)) {
+	// 	return res.status(400).json({error: 'Invalid input provided'})
+	// }
+
+/*	const cachedData = cache.get(name);
+	if (cachedData) {
+		return res.json(cachedData);
+	}*/
+	try {
+		let response;
+
+		/*if (name && type) {
+			const typeResponse = await axios.get(`${POKEAPI_URL}type/${type}`);
+			response = typeResponse.data.pokemon.filter(p => p.pokemon.name.includes(name));
+			if (response.length === 0)
+					return res.status(404).json({message: 'No Pokemon found of that name and type'});
+		}
+		else */if (pokemonId) {
+			//const nameResponse = await axios.get(`${POKEAPI_URL}pokemon/${name}`);
+			response = await axios.get(`${POKEAPI_URL}pokemon/${encodeURIComponent(pokemonId)}`)//nameResponse.data//.results.filter(p => p.name.includes(name));
+		}
+		else {
+			response = await axios.get(`${POKEAPI_URL}pokemon?limit=1305`);
+		}
+/*		cache.set(name, response.data);
+		manageCacheSize();*/
+		res.json(response.data);
+	}
+	catch (err) {
+		console.error(err);
+		res.status(500).json({error: "Failed to fetch Pokemon data"})
+	}
+});
+
 module.exports = router;

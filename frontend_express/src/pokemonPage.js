@@ -5,8 +5,6 @@ import { jwtDecode } from "jwt-decode"
 
 const PokemonPage = () => {
     const { name } = useParams();
-    const navigate = useNavigate();
-    const location = useLocation();
     const [pokemon, setPokemon] = useState(null);
     const [error, setError] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,15 +12,8 @@ const PokemonPage = () => {
     const [liked, setLiked] = useState(false);
     const [likeMessage, setLikeMessage] = useState(''); // State for error messages
     const [unlikeMessage, setUnlikeMessage] = useState(''); // State for success messages
-    const currentPage = location.state?.currentPage || JSON.parse(localStorage.getItem('currentPage')) || 1;
-
-    console.log('Current page in storage', currentPage);
-
-    useEffect(() => {
-        if (currentPage) {
-            localStorage.setItem('currentPage', JSON.stringify(currentPage));
-        }
-    }, [currentPage]);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
@@ -117,9 +108,16 @@ const PokemonPage = () => {
     if (error) return <div>Error: {error}</div>;
     if (!pokemon) return <div>Loading...</div>;
 
+    const { currentPage } = location.state || { currentPage: 1 };
+
+    console.log(currentPage)
+
     return (
         <div>
-            <button onClick={handleReturn} className="back-button">Back to List</button>
+            {/* Back button navigates to the list and maintains the page */}
+            <button onClick={() => navigate('/', { state: { currentPage } })}>
+                Back to Pokémon List
+            </button>
             <h1 className="text-4xl font-bold pt-4">
                 {name.charAt(0).toUpperCase() + name.slice(1)}
             </h1>

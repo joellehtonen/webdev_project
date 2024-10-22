@@ -1,40 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './pokemonList.css';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useLocation } from 'react-router-dom';
 
 const PokemonList = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
     const [pokemonList, setPokemon] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredList, setFilteredList] = useState([]);
-    const [currentPage, setCurrentPage] = useState(() => {
-        const savedPage = location.state?.currentPage || localStorage.getItem('currentPage');
-        return savedPage ? JSON.parse(savedPage) : 1;
-    });
     const itemsPerPage = 50;
     const [users, setUsers] = useState([]);
     const [userSearchQuery, setUserSearchQuery] = useState('');
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [showTypeDropdown, setShowTypeDropdown] = useState(false);
     const [types, setTypes] = useState([]);
-
-    console.log('Current page before funcs', currentPage);
-
-    useEffect(() => {
-        if (currentPage) {
-            localStorage.setItem('currentPage', JSON.stringify(currentPage));
-        }
-    }, [currentPage]);
-
-    // Go to Pokemon page
-    const goToPokemonPage = (poke) => {
-        console.log(`Clicked on Pokemon: ${poke.name}, current page stored: ${currentPage}`);
-        navigate(`/pokemon/${poke.name}`, { state: {currentPage}});
-    }
+    const [selectedType, setSelectedType] = useState(null)
+    const [sortAZ, setSortAZ] = useState(false); // A-Z checkbox
+    const [sortZA, setSortZA] = useState(false); // Z-A checkbox
+    const [typeFilteredList, setTypeFilteredList] = useState([]);
+    const location = useLocation();
+    const { currentPage: initialPage } = location.state || { currentPage: 1 };  // Default to page 1 if no state is passed
+    const [currentPage, setCurrentPage] = useState(initialPage);
 
     // Fetch Pokémon data
     useEffect(() => {
@@ -54,28 +41,46 @@ const PokemonList = () => {
 
     // Filter Pokémon based on search query
     useEffect(() => {
+        let filtered = pokemonList;
+
+        if (selectedType) {
+            filtered = typeFilteredList
+        }
+
         if (searchQuery) {
-            const filtered = pokemonList.filter(pokemon =>
+            filtered = filtered.filter(pokemon =>
                 pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
-            setFilteredList(filtered);
-        } else {
-            setFilteredList(pokemonList);
         }
-        setCurrentPage(1);
-    }, [searchQuery, pokemonList]);
+
+        // Sort if checkboxes are checked
+        if (sortAZ || sortZA) {
+            filtered = sortPokemons(filtered);
+        }
+
+        setFilteredList(filtered);
+        setCurrentPage(initialPage);
+        if (searchQuery) {
+            setCurrentPage(1)
+        }
+    }, [searchQuery, pokemonList, sortAZ, sortZA]);
+
+    console.log(`console.log in search bar ${currentPage}`)
 
     // Fetch users data
     useEffect(() => {
+        const token = localStorage.getItem('auth_token')
         const fetchUsers = async () => {
-            try {
-                const resp = await axios.get('http://localhost:5000/users');
-                setUsers(resp.data);
-                setFilteredUsers(resp.data);
-            } catch (err) {
-                setError('Failed to fetch users');
+            if (token) {
+                try {
+                    const resp = await axios.get('http://localhost:5000/users');
+                    setUsers(resp.data);
+                    setFilteredUsers(resp.data);
+                } catch (err) {
+                    setError('Failed to fetch users');
+                }
             }
-        };
+        }
         fetchUsers();
     }, []);
 
@@ -106,16 +111,60 @@ const PokemonList = () => {
     }, []);
 
     const filterByType = async (type) => {
-        try {
-            const resp = await axios.get(`http://localhost:5000/pokemon/type${type}`)
-            const pokemonByType = resp.data.pokemon
-            setFilteredList(pokemonByType)
+        setSearchQuery('')
+        if (type === 'all') {
+            setFilteredList(sortPokemons(pokemonList))
+            setTypeFilteredList(pokemonList)
+            setSelectedType(null)
             setShowTypeDropdown(false)
             setCurrentPage(1)
+            console.log(`console.log in type all ${currentPage}`)
+            return;
+        }
+        try {
+            const resp = await axios.get(`http://localhost:5000/pokemon?type=${type}`)
+            console.log(resp.data);
+            const pokemonByType = resp.data.pokemon.map(p => ({
+                name: p.pokemon.name,
+                url: p.pokemon.url,
+                types: p.pokemon.types
+            }))
+            const sortedPokemons = sortPokemons(pokemonByType);
+            setFilteredList(sortedPokemons)
+            setTypeFilteredList(sortedPokemons)
+            setShowTypeDropdown(false)
+            setCurrentPage(1)
+            console.log(`console.log in type filtered ${currentPage}`)
+            setSelectedType(type)
         } catch (err) {
             setError(`Failed to fetch pokemon by type`)
         }
     }
+
+    const sortPokemons = (list) => {
+        return [...list].sort((a, b) => {
+            const nameA = a.name.toLowerCase()
+            const nameB = b.name.toLowerCase()
+
+            if (sortAZ && !sortZA) {
+                return nameA.localeCompare(nameB);
+            } else if (sortZA && !sortAZ) {
+                return nameB.localeCompare(nameA);
+            }
+            return 0
+        })
+    }
+
+    // Update sorting states
+    const handleSortAZ = () => {
+        setSortAZ(prev => !prev); // Toggle A-Z sorting
+        if (sortZA) setSortZA(false); // Ensure Z-A is off
+    };
+
+    const handleSortZA = () => {
+        setSortZA(prev => !prev); // Toggle Z-A sorting
+        if (sortAZ) setSortAZ(false); // Ensure A-Z is off
+    };
 
     if (loading) {
         return (
@@ -155,33 +204,46 @@ const PokemonList = () => {
                 className="border rounded p-2 mb-4"
             />
 
-            {/* User Dropdown List */}
-            {filteredUsers.length > 0 && (
+            {/* Pokémon Types Dropdown */}
+            <button onClick={() => setShowTypeDropdown(prev => !prev)}>
+                {selectedType ? `Filter by ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}` : 'Pokemon Types'}
+            </button>
+            {showTypeDropdown && types.length > 0 && (
                 <div className="dropdown-list">
-                    {filteredUsers.map((user) => (
+                    <div
+                        className="dropdown-item"
+                        onClick={() => filterByType('all')} // Handle "All Pokémon"
+                    >
+                        All Pokémon
+                    </div>
+                    {types.map((type) => (
                         <div
-                            key={user.id}
-                            onClick={() => navigate(`/users/${user.id}`)}
+                            key={type.name}
+                            /*to={`/pokemon/type/${type.name}`}*/
                             className="dropdown-item"
+                            onClick={() => //{
+                                //setShowTypeDropdown(false); // Hide dropdown after selection
+                                filterByType(type.name)
+                            }//}
                         >
-                            {user.username}
+                            {type.name.charAt(0).toUpperCase() + type.name.slice(1)} {/* Capitalize first letter */}
                         </div>
                     ))}
                 </div>
             )}
 
-            {/* Pokémon Types Dropdown */}
-            <button onClick={() => setShowTypeDropdown(prev => !prev)}>Pokemon Types</button>
-            {showTypeDropdown && types.length > 0 && (
+            {/* User Dropdown List */}
+            {filteredUsers.length > 0 && (
                 <div className="dropdown-list">
-                    {types.map((type) => (
-                        <div
-                            key={type.name}
-                            onClick={() => filterByType(type.name)}
-                            className="dropdown-item"
+                    {filteredUsers.map((user) => (
+                        <Link
+                            key={user.id}
+                            to={`/users/${user.id}`} // Link to user detail page
+                            className="dropdown-item" // Class for styling
+                            onClick={() => setUserSearchQuery('')} // Clear the search query on click
                         >
-                            {type.name.charAt(0).toUpperCase() + type.name.slice(1)} {/* Capitalize first letter */}
-                        </div>
+                            {user.username}
+                        </Link>
                     ))}
                 </div>
             )}
@@ -193,13 +255,33 @@ const PokemonList = () => {
                 onChange={(e) => setUserSearchQuery(e.target.value)}
                 className="border rounded p-2 mb-4"
             />
+
+            <div>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={sortAZ}
+                        onChange={handleSortAZ}
+                    />
+                    Sort A-Z
+                </label>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={sortZA}
+                        onChange={handleSortZA}
+                    />
+                    Sort Z-A
+                </label>
+            </div>
+
             <div className="pokemon-grid">
                 {paginatedList.map((poke) => (
                     <div className="pokemon-card" key={poke.name}>
-                        <div onClick={() => goToPokemonPage(poke)} style={{ cursor: 'pointer' }}>
-                            <h3>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3>
-                        </div>
+                    <div onClick={() => goToPokemonPage(poke)} style={{ cursor: 'pointer' }}>
+                        <h3>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3>
                     </div>
+                </div>
                 ))}
             </div>
             <div className="pagination">

@@ -17,9 +17,6 @@ router.get('/user/:userId', async (req, res) => {
 			FROM likes
 			WHERE user_id = $1`, [userId]
 		)
-		if (result.rows.length === 0) {
-			return res.status(404).json({error: 'User not found'});
-		}
 		res.json(result.rows);
 	}
 	catch (err) {
