@@ -9,6 +9,7 @@ import RegisterPage from './registerPage';//
 import LoginPage from './loginForm';
 import UserPage from './userPage';
 import PokemonPage from './pokemonPage';
+import UserSettingsPage from './userSettingsPage';
 import './App.css';
 import axios from 'axios';
 //import IsTokenExpired from './handleTokenExpired';
@@ -114,6 +115,7 @@ const handleLogout = () => {
 
             <div id="header">
             <div className="flex-container" style={{position: "relative"}}>
+            {isLoggedIn && (
             <input
                 type="text"
                 placeholder="Search User"
@@ -121,6 +123,7 @@ const handleLogout = () => {
                 onChange={(e) => setUserSearchQuery(e.target.value)}
                 className="border rounded p-2 mb-4 input-center"
             />
+            )}
                 {/* User Dropdown List */}
                 {filteredUsers.length > 0 && (
                 <div className="dropdown-list">
@@ -136,8 +139,8 @@ const handleLogout = () => {
                     ))}
                 </div>
                 )}
-                </div>
-                </div>
+              </div>
+            </div>
                 
             <ul className="navbar-nav">
               { isLoggedIn
@@ -145,10 +148,13 @@ const handleLogout = () => {
                 /* Show Logout button if logged in */
                 <>
                   <li className="nav-item">
-                  <button className="nav-link text-capitalize" onClick={() => navigate(`/user/${userId}`)}>{userName}'s Home</button>
+                    <button className="nav-link text-capitalize" onClick={() => navigate(`/user/${userId}`)}>{userName}'s Home</button>
                   </li>
                   <li className="nav-item">
                     <button className="nav-link" onClick={handleLogout}>Logout</button>
+                  </li>
+                  <li className="nav-item">
+                    <button className="nav-link" onClick={() => navigate(`/user/settings`)}>Settigs</button>
                   </li>
                 </>
                 :
@@ -174,6 +180,7 @@ const handleLogout = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/user/:userId" element={<UserPage />} />
           <Route path="/pokemon/:name" element={<PokemonPage />} />
+          <Route path="/user/settings" element={<UserSettingsPage />} />
         </Routes>
       </main>
 
