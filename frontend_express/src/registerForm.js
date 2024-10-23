@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import PasswordChecks from "./pswCheck.js";
 
 const RegisterForm = () => {
   // Manage state for form inputs and messages
@@ -16,14 +17,24 @@ const RegisterForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission
 
-    if (password && password.length < 6) {
-      setError('password must be at least 6 characters long.');
+    if (password && password !== confirmPassword) {
+      setError(`password and confirmation do not match.`)
+      setConfirmPassword('')
       return
     }
 
-    if (password && password !== confirmPassword) {
-      setError(`password and confirmation do not match.`)
-      return
+    const alphanumericRegex = /^[a-zA-Z0-9_.!-]+$/;
+    if (!alphanumericRegex.test(username)) {
+        setError("Username must contain only alphanumeric characters and special characters (_, ., !, -).");
+        setConfirmPassword('')
+        return;
+    }
+
+    const passwordCheckResult = PasswordChecks(password);
+    if (!passwordCheckResult.isValid) {
+        setError(passwordCheckResult.error); // Set error if the password is invalid
+        setConfirmPassword('')
+        return; // Exit the function early
     }
 
     try {
@@ -32,16 +43,19 @@ const RegisterForm = () => {
         password
       });
 
+      setError("");
       setSuccess("Registration successful! Redirecting to the login page ..."); // Show success message
       setUsername(""); // Clear username input
       setPassword(""); // Clear password input
-      setError(""); // Clear any previous errors
       setConfirmPassword('')
       setTimeout(() => {
         navigate('/login'); // Redirect to the homepage or another route
     }, 3000);
     } catch (err) {
-      setError("Registration failed. Please try again."); // Show error message
+      const errorMessage = err.response && err.response.data && err.response.data.error 
+      ? err.response.data.error 
+      : "Registration failed. Please try again.";
+      setError(errorMessage); // Show error message
       setSuccess(""); // Clear success message
     }
   };

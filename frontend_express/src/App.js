@@ -125,7 +125,7 @@ const handleLogout = () => {
             />
             )}
                 {/* User Dropdown List */}
-                {filteredUsers.length > 0 && (
+                {filteredUsers.length > 0 && isLoggedIn && (
                 <div className="dropdown-list">
                     {filteredUsers.map((user) => (
                         <Link

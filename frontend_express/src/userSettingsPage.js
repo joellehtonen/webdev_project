@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import PasswordChecks from "./pswCheck";
 
 const UserSettingsPage = () => {
     const [currentPassword, setCurrentPassword] = useState ('')
@@ -14,18 +15,28 @@ const UserSettingsPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        setError('')
-        setSuccess('')
 
         if (newPassword && newPassword !== confirmPassword) {
             setError(`New password and confirmation do not match.`)
             return
         }
 
-        if (newPassword && newPassword.length < 6) {
-            setError('New password must be at least 6 characters long.');
-            return
+        if (newUsername) {
+            const alphanumericRegex = /^[a-zA-Z0-9_.!-]+$/;
+            if (!alphanumericRegex.test(newUsername)) {
+                setError("Username must contain only alphanumeric characters and special characters (_, ., !, -).");
+                return;
+            }
         }
+    
+        if (newPassword) {
+            const passwordCheckResult = PasswordChecks(newPassword);
+            if (!passwordCheckResult.isValid) {
+                setError(passwordCheckResult.error); // Set error if the password is invalid
+                return; // Exit the function early
+            }
+        }
+        
 
         try {
             const token = localStorage.getItem(`auth_token`)
@@ -48,6 +59,7 @@ const UserSettingsPage = () => {
             })
 
             if (response.status === 200) {
+                setError('')
                 setSuccess('Credentials updated successfully!');
                 setCurrentPassword('');
                 setNewUsername('');
@@ -56,7 +68,7 @@ const UserSettingsPage = () => {
 
                 setTimeout(() => {
                 navigate('/');
-                }, 3000);
+                }, 2000);
             }
         } catch (err) {
             console.error('Error updating credentials:', err)
