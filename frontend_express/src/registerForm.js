@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 const RegisterForm = () => {
   // Manage state for form inputs and messages
@@ -7,6 +8,9 @@ const RegisterForm = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState ('')
+
+  const navigate = useNavigate();
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -17,16 +21,25 @@ const RegisterForm = () => {
       return
     }
 
+    if (password && password !== confirmPassword) {
+      setError(`password and confirmation do not match.`)
+      return
+    }
+
     try {
       const response = await axios.post("http://localhost:5000/auth/register", {
         username,
         password
       });
 
-      setSuccess("Registration successful!"); // Show success message
+      setSuccess("Registration successful! Redirecting to the login page ..."); // Show success message
       setUsername(""); // Clear username input
       setPassword(""); // Clear password input
       setError(""); // Clear any previous errors
+      setConfirmPassword('')
+      setTimeout(() => {
+        navigate('/login'); // Redirect to the homepage or another route
+    }, 3000);
     } catch (err) {
       setError("Registration failed. Please try again."); // Show error message
       setSuccess(""); // Clear success message
@@ -60,6 +73,17 @@ const RegisterForm = () => {
                 required
                 className="form-control"
               />
+            {/* Confirm new password field */}
+            <div className="mb-3">
+                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="form-control"
+                />
+            </div>
             </div>
             <button type="submit" className="btn btn-primary">Register</button>
           </form>
