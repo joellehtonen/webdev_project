@@ -4,6 +4,7 @@ import './pokemonList.css';
 import { Link, useLocation, useNavigate} from 'react-router-dom';
 import { jwtDecode } from "jwt-decode"
 import { wait } from '@testing-library/user-event/dist/utils';
+import './App.css'
 
 const PokemonList = () => {
     const [pokemonList, setPokemon] = useState([]);
@@ -278,6 +279,7 @@ const PokemonList = () => {
 
     return (
         <div>
+            <div style={{position: 'relative', marginLeft: '10%', marginTop: '.5%'}}>
             <input
                 type="text"
                 placeholder="Search Pokémon"
@@ -285,9 +287,8 @@ const PokemonList = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="border rounded p-2 mb-4"
             />
-
             {/* Pokémon Types Dropdown */}
-            <button onClick={() => setShowTypeDropdown(prev => !prev)}>
+            <button className="button" onClick={() => setShowTypeDropdown(prev => !prev)} style={{marginLeft: '.5%'}}>
                 {selectedType ? `Filter by ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}` : 'Pokémon Types'}
             </button>
             {showTypeDropdown && types.length > 0 && (
@@ -313,37 +314,13 @@ const PokemonList = () => {
                     ))}
                 </div>
             )}
-
-            {/* User Dropdown List */}
-            {/* {filteredUsers.length > 0 && (
-                <div className="dropdown-list dropdown-right flex-container">
-                    {filteredUsers.map((user) => (
-                        <Link
-                            key={user.id}
-                            to={`/user/${user.id}`} // Link to user detail page
-                            className="dropdown-item" // Class for styling
-                            onClick={() => setUserSearchQuery('')} // Clear the search query on click
-                        >
-                            {user.username}
-                        </Link>
-                    ))}
-                </div>
-            )}
-
-            <input
-                type="text"
-                placeholder="Search User"
-                value={userSearchQuery}
-                onChange={(e) => setUserSearchQuery(e.target.value)}
-                className="border rounded p-2 mb-4 input-right flex-container"
-            /> */}
-
             <div>
-            <label style={{ marginRight: '10px' }}>
+            <label style={{ marginRight: '2%' }}>
                     <input
                         type="checkbox"
                         checked={sortAZ}
                         onChange={handleSortAZ}
+                        style={{marginRight: '5px'}}
                     />
                     Sort A-Z
                 </label>
@@ -352,9 +329,11 @@ const PokemonList = () => {
                         type="checkbox"
                         checked={sortZA}
                         onChange={handleSortZA}
+                        style={{marginRight: '5px'}}
                     />
                     Sort Z-A
                 </label>
+            </div>
             </div>
             <div className="container-xl text-center">
                 <ul className="d-flex flex-wrap ">
@@ -364,7 +343,7 @@ const PokemonList = () => {
                                 <h3 className="text text-capitalize mt-3">{p.name}</h3>
                                 <Link className="text text-capitalize" 
                                 to={`/pokemon/${p.name}`}
-                                state={{ currentPage, pokemonList: filteredList}}>
+                                state={{ currentPage, pokemonList: filteredList }}>
                                     <img src={p.sprites.other['official-artwork'].front_default}
                                         alt={`Picture of ${p.name}`}
                                         width={200}
@@ -389,9 +368,9 @@ const PokemonList = () => {
                 </ul>
             </div>
             <div className="pagination">
-                <button onClick={goToPreviousPage}>Previous</button>
-                <span>{`Page ${currentPage} of ${totalPages}`}</span>
-                <button onClick={goToNextPage}>Next</button>
+                <button className="button" style={{marginRight: '.5%'}} onClick={goToPreviousPage}>Previous</button>
+                <span style={{marginTop: '.5%'}}>{`Page ${currentPage} of ${totalPages}`}</span>
+                <button className="button"style={{marginLeft: '.5%'}}onClick={goToNextPage}>Next</button>
             </div>
         </div>
     );

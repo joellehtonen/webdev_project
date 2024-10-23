@@ -121,7 +121,7 @@ const handleLogout = () => {
                   />
                 )}
                 {/* User Dropdown List */}
-                {filteredUsers.length > 0 && (
+                {filteredUsers.length > 0 && isLoggedIn && (
                   <div className="dropdown-list list-group mx-5">
                     {filteredUsers.map((user) => (
                       <Link
@@ -150,7 +150,7 @@ const handleLogout = () => {
                     <button className="nav-link" onClick={handleLogout}>Logout</button>
                   </li>
                   <li className="nav-item">
-                    <button className="nav-link" onClick={() => navigate(`/user/settings`)}>Settigs</button>
+                    <button className="nav-link" onClick={() => navigate(`/user/settings`)}>Settings</button>
                   </li>
                 </>
                 :
