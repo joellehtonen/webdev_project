@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import PasswordChecks from "./pswCheck.js";
 
 const RegisterForm = () => {
   // Manage state for form inputs and messages
@@ -7,10 +9,33 @@ const RegisterForm = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState ('')
+
+  const navigate = useNavigate();
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission
+
+    if (password && password !== confirmPassword) {
+      setError(`password and confirmation do not match.`)
+      setConfirmPassword('')
+      return
+    }
+
+    const alphanumericRegex = /^[a-zA-Z0-9_.!-]+$/;
+    if (!alphanumericRegex.test(username)) {
+        setError("Username must contain only alphanumeric characters and special characters (_, ., !, -).");
+        setConfirmPassword('')
+        return;
+    }
+
+    const passwordCheckResult = PasswordChecks(password);
+    if (!passwordCheckResult.isValid) {
+        setError(passwordCheckResult.error); // Set error if the password is invalid
+        setConfirmPassword('')
+        return; // Exit the function early
+    }
 
     try {
       const response = await axios.post("http://localhost:5000/auth/register", {
@@ -18,12 +43,19 @@ const RegisterForm = () => {
         password
       });
 
-      setSuccess("Registration successful!"); // Show success message
+      setError("");
+      setSuccess("Registration successful! Redirecting to the login page ..."); // Show success message
       setUsername(""); // Clear username input
       setPassword(""); // Clear password input
-      setError(""); // Clear any previous errors
+      setConfirmPassword('')
+      setTimeout(() => {
+        navigate('/login'); // Redirect to the homepage or another route
+    }, 3000);
     } catch (err) {
-      setError("Registration failed. Please try again."); // Show error message
+      const errorMessage = err.response && err.response.data && err.response.data.error 
+      ? err.response.data.error 
+      : "Registration failed. Please try again.";
+      setError(errorMessage); // Show error message
       setSuccess(""); // Clear success message
     }
   };
@@ -55,6 +87,17 @@ const RegisterForm = () => {
                 required
                 className="form-control"
               />
+            {/* Confirm new password field */}
+            <div className="mb-3">
+                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="form-control"
+                />
+            </div>
             </div>
             <button type="submit" className="btn btn-primary">Register</button>
           </form>

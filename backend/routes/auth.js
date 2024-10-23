@@ -6,7 +6,7 @@
 /*   By: mpellegr <mpellegr@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/15 11:31:12 by pleander          #+#    #+#             */
-/*   Updated: 2024/10/16 14:25:25 by mpellegr         ###   ########.fr       */
+/*   Updated: 2024/10/23 10:54:59 by mpellegr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,41 @@ router.post('/login', async (req, res) => {
 	}
 	catch (err) {
 		console.error(err);
+		res.status(500).json({ error: 'Internal server error' });
+	}
+})
+
+router.put(`/updateCredentials`, authMiddleware, async (req, res) => {
+	const { currentPassword, newPassword, newUsername } = req.body
+	const userId = req.user.id
+	try {
+		const result = await pool.query(`SELECT id, username, hashed_password FROM users WHERE id = ($1)`, [userId])
+		if (result.rows.length === 0) {
+			return res.status(404).json({ error: 'User not found' })
+		}
+		const user = result.rows[0]
+
+		const isPasswordCorrect = await bcrypt.compare(currentPassword, user.hashed_password)
+		if (!isPasswordCorrect) {
+			return res.status(400).json({ error: 'Current password is incorrect' });
+		}
+
+		if (newUsername) {
+			const usernameExists = await pool.query(`SELECT username FROM users WHERE username = $1`, [newUsername])
+			if (usernameExists.rows.length !== 0) {
+				return res.status(400).json({ error: 'Username already taken' });
+			}
+			await pool.query(`UPDATE users SET username = $1 WHERE id =$2`, [newUsername, userId] )
+		}
+
+		if (newPassword) {
+			const hashedNewPassword = await bcrypt.hash(newPassword, 10)
+			await pool.query(`UPDATE users SET hashed_password = $1 WHERE id = $2`, [hashedNewPassword, userId])
+		}
+
+		res.json({ message: 'User credentials updated successfully' })
+	} catch (err) {
+		console.error(err)
 		res.status(500).json({ error: 'Internal server error' });
 	}
 })

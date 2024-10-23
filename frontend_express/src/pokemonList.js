@@ -2,6 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import './pokemonList.css';
 import { Link, useLocation, useNavigate} from 'react-router-dom';
+import { jwtDecode } from "jwt-decode"
+import { wait } from '@testing-library/user-event/dist/utils';
 
 const PokemonList = () => {
     const [pokemonList, setPokemon] = useState([]);
@@ -23,6 +25,40 @@ const PokemonList = () => {
     const { currentPage: initialPage } = location.state || { currentPage: 1 };  // Default to page 1 if no state is passed
     const [currentPage, setCurrentPage] = useState(initialPage);
     const [paginatedList, setPaginatedList] = useState([]);
+    const [authToken, setAuthToken] = useState("");
+    const [decodedToken, setDecodedToken] = useState({});
+    const [userLikes, setUserLikes] = useState([]);
+    const [userId, setUserId] = useState(null);
+
+    useEffect(() => {
+        const token = localStorage.getItem('auth_token');
+        if (token && token.split('.').length === 3) { // Check if it has 3 parts
+            setAuthToken(token);
+            const decodedToken = jwtDecode(token);
+            setDecodedToken(decodedToken);
+            setUserId(decodedToken.id);
+        } else {
+            console.error("Invalid token format:", token);
+            setAuthToken("");
+            setDecodedToken({});
+        }
+    },[])
+
+  useEffect(() => {
+        if (userId === null)
+            return ;
+        const fetchLikes = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5000/likes/user/${userId}`)
+                const likes = response.data;
+                setUserLikes(likes);
+            }
+            catch (err) {
+                console.log(`Error fetching user likes: ${err}`);
+            }
+        }
+        fetchLikes();
+  }, [userId]);
 
     const sortPokemons = useCallback((list) => {
         return [...list].sort((a, b) => {
@@ -148,7 +184,6 @@ const PokemonList = () => {
             setSelectedType(null)
             setShowTypeDropdown(false)
             setCurrentPage(1)
-            console.log(`console.log in type all ${currentPage}`)
             return;
         }
         try {
@@ -163,7 +198,6 @@ const PokemonList = () => {
             setTypeFilteredList(sortedPokemons)
             setShowTypeDropdown(false)
             setCurrentPage(1)
-            console.log(`console.log in type filtered ${currentPage}`)
             setSelectedType(type)
         } catch (err) {
             setError(`Failed to fetch pokemon by type`)
@@ -200,6 +234,47 @@ const PokemonList = () => {
     const goToPreviousPage = () => {
         if (currentPage > 1) setCurrentPage(currentPage - 1);
     };
+
+    const isLikedPokemon = (pokemonId) => {
+        
+        const liked = userLikes.find((l) => Number(l.pokemon_id) === Number(pokemonId))
+        return Boolean(liked);
+    }
+
+  const unlikePokemon = async (pokemonId, userId) => {
+
+    const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
+    const userLikes = likesResponse.data;
+    const likeToDelete = userLikes.find(like => like.pokemon_id === pokemonId);
+    if (likeToDelete) {
+	await axios.delete(`http://localhost:5000/likes/delete/${likeToDelete.id}`, {
+	    headers: {
+		'Authorization': `Bearer ${authToken}`
+	    },
+	});
+	const newUserLikes = userLikes.filter((like) => {
+	  return (like.pokemon_id !== pokemonId)
+      })
+      setUserLikes(newUserLikes);
+    }
+  }
+
+  const likePokemon = async (pokemonId, userId) => {
+    try {
+        const res = await axios.post(`http://localhost:5000/likes/add`,
+            { pokemon_id: pokemonId }, 
+            { headers:  
+                { 'Authorization': `Bearer ${authToken}`,
+                 'Content-Type': `application/json`}
+            },
+        );
+        const newUserLikes = [...userLikes, {id: res.data[0].id, user_id: userId, pokemon_id: pokemonId}]
+        setUserLikes(newUserLikes);
+    }
+    catch (err) {
+        console.log(`Error while liking pokemon: ${err}`)
+        }
+  }
 
     return (
         <div>
@@ -271,13 +346,19 @@ const PokemonList = () => {
                                         width={200}
                                         height={200}
                                     />
+
                                 </Link> 
-                                {/* Number(decodedToken.id) === Number(userId) &&
+                                { isLikedPokemon(p.id) ?
                                     <button 
                                         className="btn btn-outline-danger btn-sm mb-3 mt-3"
-                                        onClick={() => unlikePokemon(p.pokemonData.id, userId)}>
+                                        onClick={() => unlikePokemon(p.id, userId)}>
                                         Unlike</button>
-                                */}
+                                    :
+                                    <button 
+                                        className="btn btn-outline-success btn-sm mb-3 mt-3"
+                                        onClick={() => likePokemon(p.id, userId)}>
+                                        Like</button>
+                                }
                             </div>
                         </li>
                     )) }
