@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const LoginPage = () => {
     //const router = useRouter();
@@ -7,8 +7,16 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState(''); // State for error messages
     const [success, setSuccess] = useState(''); // State for success messages
+    const location = useLocation();
+    const message = location.state?.message;
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (message) {
+            setError(message);
+        }
+    }, [message]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
