@@ -287,7 +287,9 @@ const PokemonList = () => {
                         <li className="list-group-item p-3">
                             <div className="container vstack border border-secondary rounded">
                                 <h3 className="text text-capitalize mt-3">{p.name}</h3>
-                                <Link className="text text-capitalize" to={`/pokemon/${p.name}`}>
+                                <Link className="text text-capitalize" 
+                                to={`/pokemon/${p.name}`}
+                                state={{ currentPage, pokemonList: filteredList}}>
                                     <img src={p.sprites.other['official-artwork'].front_default}
                                         alt={`Picture of ${p.name}`}
                                         width={200}
