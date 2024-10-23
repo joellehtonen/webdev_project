@@ -9,7 +9,7 @@ const PokemonList = () => {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredList, setFilteredList] = useState([]);
-    const itemsPerPage = 50;
+    const itemsPerPage = 25;
     const [users, setUsers] = useState([]);
     const [userSearchQuery, setUserSearchQuery] = useState('');
     const [filteredUsers, setFilteredUsers] = useState([]);
@@ -22,8 +22,7 @@ const PokemonList = () => {
     const location = useLocation();
     const { currentPage: initialPage } = location.state || { currentPage: 1 };  // Default to page 1 if no state is passed
     const [currentPage, setCurrentPage] = useState(initialPage);
-
-    console.log(`1st console.log ${currentPage}`)
+    const [paginatedList, setPaginatedList] = useState([]);
 
     const sortPokemons = useCallback((list) => {
         return [...list].sort((a, b) => {
@@ -80,35 +79,35 @@ const PokemonList = () => {
         }
     }, [searchQuery, pokemonList, sortAZ, sortZA, sortPokemons, typeFilteredList, selectedType, initialPage]);
     
-    // Fetch users data
-    useEffect(() => {
-        const token = localStorage.getItem('auth_token')
-        const fetchUsers = async () => {
-            if (token) {
-                try {
-                    const resp = await axios.get('http://localhost:5000/users');
-                    setUsers(resp.data);
-                    setFilteredUsers(resp.data);
-                } catch (err) {
-                    setError('Failed to fetch users');
-                }
-            }
-        }
-        fetchUsers();
-    }, []);
+    // // Fetch users data
+    // useEffect(() => {
+    //     const token = localStorage.getItem('auth_token')
+    //     const fetchUsers = async () => {
+    //         if (token) {
+    //             try {
+    //                 const resp = await axios.get('http://localhost:5000/users');
+    //                 setUsers(resp.data);
+    //                 setFilteredUsers(resp.data);
+    //             } catch (err) {
+    //                 setError('Failed to fetch users');
+    //             }
+    //         }
+    //     }
+    //     fetchUsers();
+    // }, []);
 
-    // Filter users based on search query
-    useEffect(() => {
-        if (userSearchQuery) {
-            setFilteredUsers(
-                users.filter((user) =>
-                    user.username.toLowerCase().includes(userSearchQuery.toLowerCase())
-                )
-            );
-        } else {
-            setFilteredUsers([]); // Clear filtered users
-        }
-    }, [userSearchQuery, users]);
+    // // Filter users based on search query
+    // useEffect(() => {
+    //     if (userSearchQuery) {
+    //         setFilteredUsers(
+    //             users.filter((user) =>
+    //                 user.username.toLowerCase().includes(userSearchQuery.toLowerCase())
+    //             )
+    //         );
+    //     } else {
+    //         setFilteredUsers([]); // Clear filtered users
+    //     }
+    // }, [userSearchQuery, users]);
 
     // Fetch Pokémon types
     useEffect(() => {
@@ -123,6 +122,24 @@ const PokemonList = () => {
         fetchPokemonTypes();
     }, []);
 
+    useEffect(() => {
+        const paginatedList = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+        const fetchPokeData = async () => {
+            const paginatedListWithData = await Promise.all(paginatedList.map(async (pl) => {
+                try {
+                    const res = await axios.get(`http://localhost:5000/pokemon/${pl.name}`);
+                    return { ...res.data};
+                }
+                catch(err) {
+                    console.log("Error fetching Pokemon data:", err);
+                    return {name: 'undefined'}
+                }
+            }));
+            setPaginatedList(paginatedListWithData);
+        }
+        fetchPokeData();
+    }, [filteredList, currentPage]);
+
     const filterByType = async (type) => {
         setSearchQuery('')
         if (type === 'all') {
@@ -136,7 +153,6 @@ const PokemonList = () => {
         }
         try {
             const resp = await axios.get(`http://localhost:5000/pokemon?type=${type}`)
-            console.log(resp.data);
             const pokemonByType = resp.data.pokemon.map(p => ({
                 name: p.pokemon.name,
                 url: p.pokemon.url,
@@ -175,7 +191,7 @@ const PokemonList = () => {
     if (error) return <h2>{error}</h2>;
 
     const totalPages = Math.ceil(filteredList.length / itemsPerPage);
-    const paginatedList = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    
 
     const goToNextPage = () => {
         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
@@ -224,8 +240,8 @@ const PokemonList = () => {
             )}
 
             {/* User Dropdown List */}
-            {filteredUsers.length > 0 && (
-                <div className="dropdown-list dropdown-right">
+            {/* {filteredUsers.length > 0 && (
+                <div className="dropdown-list dropdown-right flex-container">
                     {filteredUsers.map((user) => (
                         <Link
                             key={user.id}
@@ -244,8 +260,8 @@ const PokemonList = () => {
                 placeholder="Search User"
                 value={userSearchQuery}
                 onChange={(e) => setUserSearchQuery(e.target.value)}
-                className="border rounded p-2 mb-4 input-right"
-            />
+                className="border rounded p-2 mb-4 input-right flex-container"
+            /> */}
 
             <div>
             <label style={{ marginRight: '10px' }}>
@@ -265,24 +281,33 @@ const PokemonList = () => {
                     Sort Z-A
                 </label>
             </div>
-
-            <div className="pokemon-grid">
-                {paginatedList.map((poke) => (
-                    <div className="pokemon-card" key={poke.name}>
-                        <Link
-                            to={`/pokemon/${poke.name}`}
-                            state={{ currentPage, pokemonList: filteredList}} // Pass the currentPage state here
-                            style={{ textDecoration: 'none', }}
-                        >
-                            <h3 style={{ fontSize: '24px' }}>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h3>
-                        </Link>
-                    </div>
-                ))}
+            <div className="container-xl text-center">
+                <ul className="d-flex flex-wrap ">
+                    { paginatedList.map((p) => (
+                        <li className="list-group-item p-3">
+                            <div className="container vstack border border-secondary rounded">
+                                <h3 className="text text-capitalize mt-3">{p.name}</h3>
+                                <Link className="text text-capitalize" 
+                                to={`/pokemon/${p.name}`}
+                                state={{ currentPage, pokemonList: filteredList}}>
+                                    <img src={p.sprites.other['official-artwork'].front_default}
+                                        alt={`Picture of ${p.name}`}
+                                        width={200}
+                                        height={200}
+                                    />
+                                </Link> 
+                                {/* Number(decodedToken.id) === Number(userId) &&
+                                    <button 
+                                        className="btn btn-outline-danger btn-sm mb-3 mt-3"
+                                        onClick={() => unlikePokemon(p.pokemonData.id, userId)}>
+                                        Unlike</button>
+                                */}
+                            </div>
+                        </li>
+                    )) }
+                </ul>
             </div>
             <div className="pagination">
-                {/* <button onClick={goToPreviousPage} disabled={currentPage === 1}>Previous</button>
-                <span>{currentPage} / {totalPages}</span>
-                <button onClick={goToNextPage} disabled={currentPage === totalPages}>Next</button> */}
                 <button onClick={goToPreviousPage}>Previous</button>
                 <span>{`Page ${currentPage} of ${totalPages}`}</span>
                 <button onClick={goToNextPage}>Next</button>

@@ -2,7 +2,7 @@
 // src/App.js
 
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom'; // Import Link here
+import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom'; // Import Link here
 import PokemonList from './pokemonList'; // Adjust the import path as necessary
 //import RegisterForm from './registerForm';//
 import RegisterPage from './registerPage';//
@@ -10,6 +10,8 @@ import LoginPage from './loginForm';
 import UserPage from './userPage';
 import PokemonPage from './pokemonPage';
 import UserSettingsPage from './userSettingsPage';
+import './App.css';
+import axios from 'axios';
 //import IsTokenExpired from './handleTokenExpired';
 
 function App() {
@@ -19,6 +21,10 @@ function App() {
   const [userId, setUserId] = useState(null);
   // const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Check login status in localStorage
@@ -34,6 +40,7 @@ function App() {
     }
 }, [location, userName]); // Re-run effect when location (route) changes
 
+// fetch your user data when logging in
 const fetchUserData = async (token) => {
   try {
     const response = await fetch(`http://localhost:5000/get_user_by_token`, {
@@ -55,12 +62,43 @@ const fetchUserData = async (token) => {
 };
 
 const handleLogout = () => {
-    // Clear the login state and token
-    localStorage.removeItem('auth_token');
-    setIsLoggedIn(false);
-    setUserName('');
-    navigate('/login'); // Redirect to login after logout
+  // Clear the login state and token
+  localStorage.removeItem('auth_token');
+  setIsLoggedIn(false);
+  setUserName('');
+  navigate('/login'); // Redirect to login after logout
 };
+
+// Fetch user data when searching for other users
+    useEffect(() => {
+      const token = localStorage.getItem('auth_token')
+      const fetchUsersSearch = async () => {
+          if (token) {
+              try {
+                  const resp = await axios.get('http://localhost:5000/users');
+                  setUsers(resp.data);
+                  setFilteredUsers(resp.data);
+              } catch (err) {
+                  setError('Failed to fetch users');
+              }
+          }
+      }
+      fetchUsersSearch();
+  }, []);
+
+  // Filter users based on search query
+  useEffect(() => {
+      if (userSearchQuery) {
+          setFilteredUsers(
+              users.filter((user) =>
+                  user.username.toLowerCase().includes(userSearchQuery.toLowerCase())
+              )
+          );
+      } else {
+          setFilteredUsers([]); // Clear filtered users
+      }
+  }, [userSearchQuery, users]);
+
 
   return (
     <div>
@@ -74,6 +112,34 @@ const handleLogout = () => {
                 }}
               >Pokémon Finder</button>
             </div>
+
+            <div id="header">
+            <div classname="flex-container" style={{position: "relative"}}>
+            <input
+                type="text"
+                placeholder="Search User"
+                value={userSearchQuery}
+                onChange={(e) => setUserSearchQuery(e.target.value)}
+                className="border rounded p-2 mb-4 input-center"
+            />
+                {/* User Dropdown List */}
+                {filteredUsers.length > 0 && (
+                <div className="dropdown-list">
+                    {filteredUsers.map((user) => (
+                        <Link
+                            key={user.id}
+                            to={`/user/${user.id}`} // Link to user detail page
+                            className="dropdown-item" // Class for styling
+                            onClick={() => setUserSearchQuery('')} // Clear the search query on click
+                        >
+                            {user.username}
+                        </Link>
+                    ))}
+                </div>
+                )}
+                </div>
+                </div>
+                
             <ul className="navbar-nav">
               { isLoggedIn
                 ? 
