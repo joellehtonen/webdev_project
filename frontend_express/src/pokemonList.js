@@ -203,6 +203,7 @@ const PokemonList = () => {
 
     return (
         <div>
+            <div style={{position: 'relative', marginLeft: '10%'}}>
             <input
                 type="text"
                 placeholder="Search Pokémon"
@@ -210,9 +211,8 @@ const PokemonList = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="border rounded p-2 mb-4"
             />
-
             {/* Pokémon Types Dropdown */}
-            <button onClick={() => setShowTypeDropdown(prev => !prev)}>
+            <button onClick={() => setShowTypeDropdown(prev => !prev)} style={{marginLeft: '.5%'}}>
                 {selectedType ? `Filter by ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}` : 'Pokémon Types'}
             </button>
             {showTypeDropdown && types.length > 0 && (
@@ -238,33 +238,8 @@ const PokemonList = () => {
                     ))}
                 </div>
             )}
-
-            {/* User Dropdown List */}
-            {/* {filteredUsers.length > 0 && (
-                <div className="dropdown-list dropdown-right flex-container">
-                    {filteredUsers.map((user) => (
-                        <Link
-                            key={user.id}
-                            to={`/user/${user.id}`} // Link to user detail page
-                            className="dropdown-item" // Class for styling
-                            onClick={() => setUserSearchQuery('')} // Clear the search query on click
-                        >
-                            {user.username}
-                        </Link>
-                    ))}
-                </div>
-            )}
-
-            <input
-                type="text"
-                placeholder="Search User"
-                value={userSearchQuery}
-                onChange={(e) => setUserSearchQuery(e.target.value)}
-                className="border rounded p-2 mb-4 input-right flex-container"
-            /> */}
-
             <div>
-            <label style={{ marginRight: '10px' }}>
+            <label style={{ marginRight: '2%' }}>
                     <input
                         type="checkbox"
                         checked={sortAZ}
@@ -281,6 +256,7 @@ const PokemonList = () => {
                     Sort Z-A
                 </label>
             </div>
+            </div>
             <div className="container-xl text-center">
                 <ul className="d-flex flex-wrap ">
                     { paginatedList.map((p) => (
@@ -289,7 +265,7 @@ const PokemonList = () => {
                                 <h3 className="text text-capitalize mt-3">{p.name}</h3>
                                 <Link className="text text-capitalize" 
                                 to={`/pokemon/${p.name}`}
-                                state={{ currentPage, pokemonList: filteredList}}>
+                                state={{ currentPage, pokemonList: filteredList }}>
                                     <img src={p.sprites.other['official-artwork'].front_default}
                                         alt={`Picture of ${p.name}`}
                                         width={200}

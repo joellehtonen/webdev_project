@@ -27,7 +27,33 @@
 	position: relative;
 }
 
-/* .dropdown-item {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-} */
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px; 
+    font-size: 16px; 
+    font-weight: bold; 
+    color: #fff; 
+    background-color: #4a90e2;
+    border: 1px solid #0056b3;
+    border-radius: 3px;
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.button:hover {
+    background-color: #0056b3;
+    transform: translateY(2px);
+}
+
+.button:active {
+    transform: translateY(1px);
+}
+
+.button:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    box-shadow: none;
+}
