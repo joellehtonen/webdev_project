@@ -12,6 +12,11 @@ const RegisterForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission
 
+    if (password && password.length < 6) {
+      setError('password must be at least 6 characters long.');
+      return
+    }
+
     try {
       const response = await axios.post("http://localhost:5000/auth/register", {
         username,

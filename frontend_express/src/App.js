@@ -9,6 +9,7 @@ import RegisterPage from './registerPage';//
 import LoginPage from './loginForm';
 import UserPage from './userPage';
 import PokemonPage from './pokemonPage';
+import UserSettingsPage from './userSettingsPage';
 //import IsTokenExpired from './handleTokenExpired';
 
 function App() {
@@ -79,10 +80,13 @@ const handleLogout = () => {
                 /* Show Logout button if logged in */
                 <>
                   <li className="nav-item">
-                  <button className="nav-link text-capitalize" onClick={() => navigate(`/user/${userId}`)}>{userName}'s Home</button>
+                    <button className="nav-link text-capitalize" onClick={() => navigate(`/user/${userId}`)}>{userName}'s Home</button>
                   </li>
                   <li className="nav-item">
                     <button className="nav-link" onClick={handleLogout}>Logout</button>
+                  </li>
+                  <li className="nav-item">
+                    <button className="nav-link" onClick={() => navigate(`/user/settings`)}>Settigs</button>
                   </li>
                 </>
                 :
@@ -108,6 +112,7 @@ const handleLogout = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/user/:userId" element={<UserPage />} />
           <Route path="/pokemon/:name" element={<PokemonPage />} />
+          <Route path="/user/settings" element={<UserSettingsPage />} />
         </Routes>
       </main>
 
