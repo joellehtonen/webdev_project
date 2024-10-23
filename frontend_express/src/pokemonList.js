@@ -23,8 +23,6 @@ const PokemonList = () => {
     const { currentPage: initialPage } = location.state || { currentPage: 1 };  // Default to page 1 if no state is passed
     const [currentPage, setCurrentPage] = useState(initialPage);
 
-    console.log(`1st console.log ${currentPage}`)
-
     const sortPokemons = useCallback((list) => {
         return [...list].sort((a, b) => {
             const nameA = a.name.toLowerCase();
@@ -80,35 +78,35 @@ const PokemonList = () => {
         }
     }, [searchQuery, pokemonList, sortAZ, sortZA, sortPokemons, typeFilteredList, selectedType, initialPage]);
     
-    // Fetch users data
-    useEffect(() => {
-        const token = localStorage.getItem('auth_token')
-        const fetchUsers = async () => {
-            if (token) {
-                try {
-                    const resp = await axios.get('http://localhost:5000/users');
-                    setUsers(resp.data);
-                    setFilteredUsers(resp.data);
-                } catch (err) {
-                    setError('Failed to fetch users');
-                }
-            }
-        }
-        fetchUsers();
-    }, []);
+    // // Fetch users data
+    // useEffect(() => {
+    //     const token = localStorage.getItem('auth_token')
+    //     const fetchUsers = async () => {
+    //         if (token) {
+    //             try {
+    //                 const resp = await axios.get('http://localhost:5000/users');
+    //                 setUsers(resp.data);
+    //                 setFilteredUsers(resp.data);
+    //             } catch (err) {
+    //                 setError('Failed to fetch users');
+    //             }
+    //         }
+    //     }
+    //     fetchUsers();
+    // }, []);
 
-    // Filter users based on search query
-    useEffect(() => {
-        if (userSearchQuery) {
-            setFilteredUsers(
-                users.filter((user) =>
-                    user.username.toLowerCase().includes(userSearchQuery.toLowerCase())
-                )
-            );
-        } else {
-            setFilteredUsers([]); // Clear filtered users
-        }
-    }, [userSearchQuery, users]);
+    // // Filter users based on search query
+    // useEffect(() => {
+    //     if (userSearchQuery) {
+    //         setFilteredUsers(
+    //             users.filter((user) =>
+    //                 user.username.toLowerCase().includes(userSearchQuery.toLowerCase())
+    //             )
+    //         );
+    //     } else {
+    //         setFilteredUsers([]); // Clear filtered users
+    //     }
+    // }, [userSearchQuery, users]);
 
     // Fetch Pokémon types
     useEffect(() => {
@@ -224,8 +222,8 @@ const PokemonList = () => {
             )}
 
             {/* User Dropdown List */}
-            {filteredUsers.length > 0 && (
-                <div className="dropdown-list dropdown-right">
+            {/* {filteredUsers.length > 0 && (
+                <div className="dropdown-list dropdown-right flex-container">
                     {filteredUsers.map((user) => (
                         <Link
                             key={user.id}
@@ -244,8 +242,8 @@ const PokemonList = () => {
                 placeholder="Search User"
                 value={userSearchQuery}
                 onChange={(e) => setUserSearchQuery(e.target.value)}
-                className="border rounded p-2 mb-4 input-right"
-            />
+                className="border rounded p-2 mb-4 input-right flex-container"
+            /> */}
 
             <div>
             <label style={{ marginRight: '10px' }}>
@@ -280,9 +278,6 @@ const PokemonList = () => {
                 ))}
             </div>
             <div className="pagination">
-                {/* <button onClick={goToPreviousPage} disabled={currentPage === 1}>Previous</button>
-                <span>{currentPage} / {totalPages}</span>
-                <button onClick={goToNextPage} disabled={currentPage === totalPages}>Next</button> */}
                 <button onClick={goToPreviousPage}>Previous</button>
                 <span>{`Page ${currentPage} of ${totalPages}`}</span>
                 <button onClick={goToNextPage}>Next</button>
