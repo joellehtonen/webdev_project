@@ -121,42 +121,38 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
         <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
           <div className="container align-items-center">
             <div className="navbar-header">
-            <button className="navbar-brand" onClick={() => {
-                  navigate('/');
-                  // window.location.reload();
-                }}
-              >Pokémon Finder</button>
+              <a className="navbar-brand" href="/">Pokémon Finder</a>
             </div>
 
             <div id="header">
-            <div className="flex-container" style={{position: "relative"}}>
-            {isLoggedIn && (
-            <input
-                type="text"
-                placeholder="Search User"
-                value={userSearchQuery}
-                onChange={(e) => setUserSearchQuery(e.target.value)}
-                className="border rounded p-2 mb-4 input-center"
-            />
-            )}
+              <div className="flex-container" style={{position: "relative"}}>
+                {isLoggedIn && (
+                  <input
+                    type="text"
+                    placeholder="Search User"
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    className="form-control mx-5"
+                  />
+                )}
                 {/* User Dropdown List */}
                 {filteredUsers.length > 0 && isLoggedIn && (
-                <div className="dropdown-list">
+                  <div className="dropdown-list list-group mx-5">
                     {filteredUsers.map((user) => (
-                        <Link
-                            key={user.id}
-                            to={`/user/${user.id}`} // Link to user detail page
-                            className="dropdown-item" // Class for styling
-                            onClick={() => setUserSearchQuery('')} // Clear the search query on click
-                        >
-                            {user.username}
-                        </Link>
+                      <Link
+                        key={user.id}
+                        to={`/user/${user.id}`} // Link to user detail page
+                        className="list-group-item text-capitalize"
+                        onClick={() => setUserSearchQuery('')} // Clear the search query on click
+                      >
+                        {user.username}
+                      </Link>
                     ))}
-                </div>
+                  </div>
                 )}
               </div>
             </div>
-                
+
             <ul className="navbar-nav">
               { isLoggedIn
                 ? 
@@ -169,7 +165,7 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
                     <button className="nav-link" onClick={handleUserLogout}>Logout</button>
                   </li>
                   <li className="nav-item">
-                    <button className="nav-link" onClick={() => navigate(`/user/settings`)}>Settigs</button>
+                    <button className="nav-link" onClick={() => navigate(`/user/settings`)}>Settings</button>
                   </li>
                 </>
                 :
@@ -199,7 +195,7 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
         </Routes>
       </main>
 
-      <footer className="footer" style={{ position: 'relative', bottom: 0, width: '100%', backgroundColor: '#343a40', color: 'white', textAlign: 'center', padding: '20px' }}>
+      <footer className="footer" style={{ osition: 'relative', bottom: 0, width: '100%', backgroundColor: '#343a40', color: 'white', textAlign: 'center', padding: '20px' }}>
         <p>&copy; 2024 Pokémon Finder. All rights reserved.</p>
       </footer>
     </div>

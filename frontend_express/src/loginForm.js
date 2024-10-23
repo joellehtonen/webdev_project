@@ -43,8 +43,6 @@ const LoginPage = () => {
 
                 // If login is successful, store login status and username in localStorage
                 localStorage.setItem('auth_token', data.auth_token);
-                localStorage.setItem('username', data.username);
-                console.log('Stored username:', username);
                 //console.log(data.auth_token)
 
                 // If login is successful, show success message5
@@ -67,6 +65,7 @@ const LoginPage = () => {
 
     return (
         <div className="container text-center">
+             <h2 style={{textAlign: 'center'}}>Sign in</h2>
             {/* Display success or error messages */}
             {success && <p style={{ color: 'green' }}>{success}</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}
