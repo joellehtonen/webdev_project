@@ -28,32 +28,40 @@
 }
 
 .button {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 10px; 
-    font-size: 16px; 
-    font-weight: bold; 
-    color: #fff; 
-    background-color: #4a90e2;
-    border: 1px solid #0056b3;
-    border-radius: 3px;
-    cursor: pointer; 
-    transition: all 0.2s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    background-color: white;
+    color: black;             
+    border: 1px solid black;
+    padding: 8px 16px;      
+    border-radius: 5px;        
+    font-size: 16px;         
+    cursor: pointer;        
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .button:hover {
-    background-color: #0056b3;
-    transform: translateY(2px);
-}
-
-.button:active {
-    transform: translateY(1px);
+    background-color: black;
+    color: white;
 }
 
 .button:disabled {
-    background-color: #ccc;
-    color: #666;
+    color: grey;             
+    border: 1px solid grey;
     cursor: not-allowed;
-    box-shadow: none;
+}
+
+.button:disabled:hover {
+    color: grey;           
+    border: 1px solid grey;
+    background-color: white;
+}
+
+.search{
+    background-color: white;
+    color: black;             
+    border: 1px solid black;
+    padding: 8px 16px;      
+    border-radius: 5px;        
+    font-size: 16px;         
+    cursor: auto;    
+    transition: background-color 0.3s ease, color 0.3s ease;
 }

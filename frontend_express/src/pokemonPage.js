@@ -55,16 +55,6 @@ const PokemonPage = () => {
         fetchPokemonPage()
     }, [name, isLoggedIn, userId])
 
-    const statColors = {
-        hp: '#7AC74C',
-        attack: '#F7D02C',
-        defense: '#EE8130',
-        'special-attack': '#96D9D6',
-        'special-defense': '#A98FF3',
-        speed: '#A33EA1',
-        // Add more stats and their corresponding colors as needed
-    };
-
     const handleLike = async () => {
         if (!isLoggedIn) {
             alert('Please log in to like Pokémon.');
@@ -132,6 +122,24 @@ const PokemonPage = () => {
         }
     };
 
+    const statColors = {
+        hp: '#7AC74C',
+        attack: '#F7D02C',
+        defense: '#EE8130',
+        'special-attack': '#96D9D6',
+        'special-defense': '#A98FF3',
+        speed: '#A33EA1',
+    };
+
+    const statNameMapping = {
+        'hp': 'HP',
+        'attack': 'Attack',
+        'defense': 'Defense',
+        'special-attack': 'Special Attack',
+        'special-defense': 'Special Defense',
+        'speed': 'Speed'
+    };
+
     return (
         <div>
             <div class="flex-container">
@@ -155,14 +163,22 @@ const PokemonPage = () => {
                     />
                 </div>
                 <div class="right-side">
-                    <h5 style={{ marginTop: '10%'}}>Height  {pokemon.height / 10} m</h5>
-                    <h5>Weight  {pokemon.weight / 10} kg</h5>
+                    <h5 style={{ marginTop: '10%'}}>Height:  {pokemon.height / 10} m</h5>
+                    <h5>Weight:  {pokemon.weight / 10} kg</h5>
                     {pokemon.stats.map((statObject) => {
                         const statName = statObject.stat.name;
                         const statValue = statObject.base_stat;
+                        const displayStatName = {
+                            'hp': 'HP',
+                            'attack': 'Attack',
+                            'defense': 'Defense',
+                            'special-attack': 'Special Attack',
+                            'special-defense': 'Special Defense',
+                            'speed': 'Speed'
+                        }[statName] || statName;
                         return (
                             <div className="flex items-stretch" style={{ width: "250px", marginBottom: "0px" }} key={statName}>
-                                <h3 className="p-1 w-2/4" style={{fontSize: '20px', marginBottom: '-0px'}}>{`${statName}: ${statValue}`}
+                                <h3 className="p-1 w-2/4" style={{fontSize: '20px', fontWeight: 'bold', marginBottom: '-0px'}}>{`${displayStatName}: ${statValue}`}
                                 </h3>
                                 <div style={{ backgroundColor: 'lightgray', width: '100%', height: '20px', borderRadius: '5px' }}>
                                     <div style={{ backgroundColor: statColors[statName] || 'green', width: `${statValue}px`, height: '100%', borderRadius: '5px' }} />
@@ -173,9 +189,12 @@ const PokemonPage = () => {
                     })}
                 </div>
                 </div>
-                <button className="button" onClick={handleLike} style={{'background-color': liked ? 'red' : 'green', width: '100px', marginLeft: '0px', marginTop: '20px'}}>
-                    {liked ? 'Unlike' : 'Like'}
-                    </button>
+                <button type="button" 
+                        onClick={handleLike}
+                        className={liked ? 'btn btn-outline-danger btn-sm mb-3 mt-3' : 'btn btn-outline-success btn-sm mb-3 mt-3'}
+                        style={{width: '100px', marginLeft: '0px', marginTop: '20px'}}>
+                        {liked ? 'Unlike' : 'Like'}
+                </button>
                 <div>
                     <label style={{ marginRight: '5px', marginTop: '10%'}}>
                         <button className="button" onClick={() => handleNavigation('prev')} disabled={pokemonList.length <= 1}>
@@ -192,6 +211,6 @@ const PokemonPage = () => {
             </div>
         </div>
     )
-}
+    }
 
 export default PokemonPage

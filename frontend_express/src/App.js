@@ -154,7 +154,7 @@ const handleLogout = () => {
                     <button className="nav-link" onClick={handleLogout}>Logout</button>
                   </li>
                   <li className="nav-item">
-                    <button className="nav-link" onClick={() => navigate(`/user/settings`)}>Settigs</button>
+                    <button className="nav-link" onClick={() => navigate(`/user/settings`)}>Settings</button>
                   </li>
                 </>
                 :

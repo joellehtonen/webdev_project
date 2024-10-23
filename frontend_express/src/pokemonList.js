@@ -4,6 +4,7 @@ import './pokemonList.css';
 import { Link, useLocation, useNavigate} from 'react-router-dom';
 import { jwtDecode } from "jwt-decode"
 import { wait } from '@testing-library/user-event/dist/utils';
+import './App.css'
 
 const PokemonList = () => {
     const [pokemonList, setPokemon] = useState([]);
@@ -278,7 +279,7 @@ const PokemonList = () => {
 
     return (
         <div>
-            <div style={{position: 'relative', marginLeft: '10%'}}>
+            <div style={{position: 'relative', marginLeft: '10%', marginTop: '.5%'}}>
             <input
                 type="text"
                 placeholder="Search Pokémon"
@@ -287,7 +288,7 @@ const PokemonList = () => {
                 className="border rounded p-2 mb-4"
             />
             {/* Pokémon Types Dropdown */}
-            <button onClick={() => setShowTypeDropdown(prev => !prev)} style={{marginLeft: '.5%'}}>
+            <button className="button" onClick={() => setShowTypeDropdown(prev => !prev)} style={{marginLeft: '.5%'}}>
                 {selectedType ? `Filter by ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}` : 'Pokémon Types'}
             </button>
             {showTypeDropdown && types.length > 0 && (
@@ -319,6 +320,7 @@ const PokemonList = () => {
                         type="checkbox"
                         checked={sortAZ}
                         onChange={handleSortAZ}
+                        style={{marginRight: '5px'}}
                     />
                     Sort A-Z
                 </label>
@@ -327,6 +329,7 @@ const PokemonList = () => {
                         type="checkbox"
                         checked={sortZA}
                         onChange={handleSortZA}
+                        style={{marginRight: '5px'}}
                     />
                     Sort Z-A
                 </label>
@@ -365,9 +368,9 @@ const PokemonList = () => {
                 </ul>
             </div>
             <div className="pagination">
-                <button onClick={goToPreviousPage}>Previous</button>
-                <span>{`Page ${currentPage} of ${totalPages}`}</span>
-                <button onClick={goToNextPage}>Next</button>
+                <button className="button" style={{marginRight: '.5%'}} onClick={goToPreviousPage}>Previous</button>
+                <span style={{marginTop: '.5%'}}>{`Page ${currentPage} of ${totalPages}`}</span>
+                <button className="button"style={{marginLeft: '.5%'}}onClick={goToNextPage}>Next</button>
             </div>
         </div>
     );
