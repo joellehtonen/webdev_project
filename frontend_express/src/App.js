@@ -121,7 +121,12 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
         <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
           <div className="container align-items-center">
             <div className="navbar-header">
-              <a className="navbar-brand" href="/">Pokémon Finder</a>
+            <a className="navbar-brand" href="/" onClick={(e) => {
+                e.preventDefault(); // Prevent the default anchor behavior
+                navigate('/'); // Programmatically navigate to the home page
+            }}>
+                Pokémon Finder
+            </a>
             </div>
 
             <div id="header">
