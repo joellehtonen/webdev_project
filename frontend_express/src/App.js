@@ -113,7 +113,7 @@ const handleLogout = () => {
             </div>
 
             <div id="header">
-            <div classname="flex-container" style={{position: "relative"}}>
+            <div className="flex-container" style={{position: "relative"}}>
             <input
                 type="text"
                 placeholder="Search User"
