@@ -27,12 +27,6 @@ const UserSettingsPage = () => {
             return
         }
 
-        const optionalFields  = {
-            currentPassword,
-            newUsername: newUsername || undefined,
-            newPassword: newPassword || undefined 
-        }
-
         try {
             const token = localStorage.getItem(`auth_token`)
             if (!token) {

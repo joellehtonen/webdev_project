@@ -115,6 +115,7 @@ const handleLogout = () => {
 
             <div id="header">
             <div classname="flex-container" style={{position: "relative"}}>
+            {isLoggedIn && (
             <input
                 type="text"
                 placeholder="Search User"
@@ -122,6 +123,7 @@ const handleLogout = () => {
                 onChange={(e) => setUserSearchQuery(e.target.value)}
                 className="border rounded p-2 mb-4 input-center"
             />
+            )}
                 {/* User Dropdown List */}
                 {filteredUsers.length > 0 && (
                 <div className="dropdown-list">
@@ -137,8 +139,8 @@ const handleLogout = () => {
                     ))}
                 </div>
                 )}
-                </div>
-                </div>
+              </div>
+            </div>
                 
             <ul className="navbar-nav">
               { isLoggedIn
