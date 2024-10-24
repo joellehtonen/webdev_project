@@ -88,7 +88,7 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
       const fetchUsersSearch = async () => {
           if (token) {
               try {
-                  const resp = await axios.get('${process.env.REACT_APP_BACKEND_URL}/users');
+                  const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users`);
                   setUsers(resp.data);
                   setFilteredUsers(resp.data);
               } catch (err) {
