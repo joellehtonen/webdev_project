@@ -94,10 +94,12 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
               } catch (err) {
                   setError('Failed to fetch users');
               }
+          console.log("token is: ")
+          console.log(token)
           }
       }
       fetchUsersSearch();
-  }, []);
+  }, [isLoggedIn]);
 
   // Filter users based on search query
   useEffect(() => {
