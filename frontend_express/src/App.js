@@ -52,8 +52,6 @@ const fetchUserData = async (token) => {
     const data = await response.json(); // Parse JSON directly from response
       setUserName(data.username);
       setUserId(data.id);
-      console.log("Logged in as", data.username); // Logging username
-      console.log("ID is", data.id); // Logging username
   } catch (error) {
     console.error("Failed to fetch username: ", error);
     localStorage.removeItem('auth_token');

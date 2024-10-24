@@ -279,61 +279,68 @@ const PokemonList = () => {
 
     return (
         <div>
-            <div style={{position: 'relative', marginLeft: '10%', marginTop: '.5%'}}>
-            <input
-                type="text"
-                placeholder="Search Pokémon"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="border rounded p-2 mb-4"
-            />
-            {/* Pokémon Types Dropdown */}
-            <button className="button" onClick={() => setShowTypeDropdown(prev => !prev)} style={{marginLeft: '.5%'}}>
-                {selectedType ? `Filter by ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}` : 'Pokémon Types'}
-            </button>
-            {showTypeDropdown && types.length > 0 && (
-                <div className="dropdown-list">
-                    <div
-                        className="dropdown-item"
-                        onClick={() => filterByType('all')} // Handle "All Pokémon"
-                    >
-                        All Pokémon
+            <div className="container p-5">
+                <div className="row">
+                    <div className="col-10">
+                        <input
+                            type="text"
+                            placeholder="Search Pokémon"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="form-control border rounded p-2 mb-4"
+                        />
                     </div>
-                    {types.map((type) => (
-                        <div
-                            key={type.name}
-                            /*to={`/pokemon/type/${type.name}`}*/
-                            className="dropdown-item"
-                            onClick={() => //{
-                                //setShowTypeDropdown(false); // Hide dropdown after selection
-                                filterByType(type.name)
-                            }//}
-                        >
-                            {type.name.charAt(0).toUpperCase() + type.name.slice(1)} {/* Capitalize first letter */}
-                        </div>
-                    ))}
+                    <div className="col">
+                        {/* Pokémon Types Dropdown */}
+                        <button className="button" onClick={() => setShowTypeDropdown(prev => !prev)}>
+                            {selectedType ? `Filter by ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}` : 'Pokémon Types'}
+                        </button>
+
+                        {showTypeDropdown && types.length > 0 && (
+                            <div className="dropdown-list">
+                                <div
+                                    className="dropdown-item"
+                                    onClick={() => filterByType('all')} // Handle "All Pokémon"
+                                >
+                                    All Pokémon
+                                </div>
+                                {types.map((type) => (
+                                    <div
+                                        key={type.name}
+                                        /*to={`/pokemon/type/${type.name}`}*/
+                                        className="dropdown-item"
+                                        onClick={() => //{
+                                            //setShowTypeDropdown(false); // Hide dropdown after selection
+                                            filterByType(type.name)
+                                        }//}
+                                    >
+                                        {type.name.charAt(0).toUpperCase() + type.name.slice(1)} {/* Capitalize first letter */}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
-            <div>
-            <label style={{ marginRight: '2%' }}>
-                    <input
-                        type="checkbox"
-                        checked={sortAZ}
-                        onChange={handleSortAZ}
-                        style={{marginRight: '5px'}}
-                    />
-                    Sort A-Z
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={sortZA}
-                        onChange={handleSortZA}
-                        style={{marginRight: '5px'}}
-                    />
-                    Sort Z-A
-                </label>
-            </div>
+                <div className="row">
+                    <div className="col-2 form-check">
+                            <input
+                                type="checkbox"
+                                checked={sortAZ}
+                                onChange={handleSortAZ}
+                                className="form-check-input m-2"
+                            />
+                        <label className="form-check-label">Sort A-Z</label>
+                        </div>
+                    <div className="col-2 form-check">
+                            <input
+                                type="checkbox"
+                                checked={sortZA}
+                                onChange={handleSortZA}
+                                className="form-check-input m-2"
+                            />
+                        <label className="form-check-label">Sort Z-A</label>
+                    </div>
+                </div>
             </div>
             <div className="container-xl text-center">
                 <ul className="d-flex flex-wrap ">
