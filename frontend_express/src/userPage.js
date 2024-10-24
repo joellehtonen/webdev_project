@@ -15,13 +15,13 @@ const UserPage = () => {
   useEffect(() => {
     const fetchLikes = async () => {
       try {
-	const response = await axios.get(`http://localhost:5000/likes/user/${encodeURIComponent(userId)}`)
+	const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/likes/user/${encodeURIComponent(userId)}`)
 	const likes = response.data;
 
 	const likedPokemons = await Promise.all(
 	  likes.map(async (p) => {
 	    try {
-	      const res = await axios.get(`http://localhost:5000/pokemon/${p.pokemon_id}`);
+	      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon/${p.pokemon_id}`);
 	      return { ...p, pokemonData: res.data }
 	    }
 	    catch(err) {
@@ -55,11 +55,11 @@ const UserPage = () => {
 
   const unlikePokemon = async (pokemonId, userId) => {
 
-    const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
+    const likesResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/likes/user/${userId}`);
     const userLikes = likesResponse.data;
     const likeToDelete = userLikes.find(like => like.pokemon_id === pokemonId);
     if (likeToDelete) {
-	await axios.delete(`http://localhost:5000/likes/delete/${likeToDelete.id}`, {
+	await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/likes/delete/${likeToDelete.id}`, {
 	    headers: {
 		'Authorization': `Bearer ${authToken}`
 	    },

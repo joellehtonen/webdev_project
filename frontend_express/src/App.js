@@ -45,7 +45,7 @@ function App() {
 // fetch your user data when logging in
 const fetchUserData = async (token) => {
   try {
-    const response = await fetch(`http://localhost:5000/get_user_by_token`, {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/get_user_by_token`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
 
@@ -88,7 +88,7 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
       const fetchUsersSearch = async () => {
           if (token) {
               try {
-                  const resp = await axios.get('http://localhost:5000/users');
+                  const resp = await axios.get('${process.env.REACT_APP_BACKEND_URL}/users');
                   setUsers(resp.data);
                   setFilteredUsers(resp.data);
               } catch (err) {

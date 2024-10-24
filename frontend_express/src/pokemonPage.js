@@ -35,13 +35,13 @@ const PokemonPage = () => {
     useEffect(() => {
         const fetchPokemonPage = async () => { 
             try {
-                const response = await axios.get(`http://localhost:5000/pokemon?name=${encodeURIComponent(name)}`)
+                const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon?name=${encodeURIComponent(name)}`)
                 setPokemon(response.data);
                 setCurrentId(response.data.id);
                 setPokemonList(location.state?.pokemonList || []);
                 setError(null)
                 if (isLoggedIn && userId) {
-                    const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
+                    const likesResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/likes/user/${userId}`);
                     const userLikes = likesResponse.data;
                     const isLiked = userLikes.some(like => like.pokemon_id === response.data.id);
                     setLiked(isLiked);
@@ -63,12 +63,12 @@ const PokemonPage = () => {
         try {
             if (liked) {
                 // Unlike the Pokémon
-                const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
+                const likesResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/likes/user/${userId}`);
                 const userLikes = likesResponse.data;
                 const likeToDelete = userLikes.find(like => like.pokemon_id === pokemon.id);
 
                 if (likeToDelete) {
-                    await axios.delete(`http://localhost:5000/likes/delete/${likeToDelete.id}`, {
+                    await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/likes/delete/${likeToDelete.id}`, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
                         },
@@ -81,7 +81,7 @@ const PokemonPage = () => {
                 }
             } else {
                 // Like the Pokémon
-                await axios.post('http://localhost:5000/likes/add', {
+                await axios.post(`${process.env.REACT_APP_BACKEND_URL}/likes/add`, {
                     pokemon_id: pokemon.id
                 }, {
                     headers: {
