@@ -75,7 +75,7 @@ const UserPage = () => {
   if (error) return <h2>{error}</h2>;
 
   return (
-    <div className="container text-center">
+    <div className="container text-center" style={{paddingBottom: '80px'}}>
       <h1>Liked Pokémon</h1>
       {likedPokemons.length === 0 ?
 	<p>Nothing liked yet.</p> 

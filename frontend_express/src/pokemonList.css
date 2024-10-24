@@ -61,5 +61,5 @@
     display: flex; /* Flex layout for pagination */
     justify-content: center; /* Center the buttons */
     margin-top: 20px; /* Space above pagination */
-    padding-bottom: 20px; /* Space below pagination to footer */
+    padding-bottom: 100px; /* Space below pagination to footer */
 }
