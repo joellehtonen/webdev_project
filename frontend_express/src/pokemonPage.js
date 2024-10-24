@@ -154,8 +154,8 @@ const PokemonPage = () => {
                     />
                 </div>
                 <div class="right-side">
-                    <h5 style={{ marginTop: '10%'}}>Height:  {pokemon.height / 10} m</h5>
-                    <h5>Weight:  {pokemon.weight / 10} kg</h5>
+                    <h5 style={{ marginTop: '10%'}}>{pokemon.height / 10} m</h5>
+                    <h5>{pokemon.weight / 10} kg</h5>
                     {pokemon.stats.map((statObject) => {
                         const statName = statObject.stat.name;
                         const statValue = statObject.base_stat;

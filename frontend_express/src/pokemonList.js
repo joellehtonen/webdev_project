@@ -368,9 +368,9 @@ const PokemonList = () => {
                 </ul>
             </div>
             <div className="pagination">
-                <button className="button" style={{marginRight: '.5%'}} onClick={goToPreviousPage}>Previous</button>
+                <button className="btn btn-outline-dark" style={{marginRight: '.5%'}} onClick={goToPreviousPage}>Previous</button>
                 <span style={{marginTop: '.5%'}}>{`Page ${currentPage} of ${totalPages}`}</span>
-                <button className="button"style={{marginLeft: '.5%'}}onClick={goToNextPage}>Next</button>
+                <button className="btn btn-outline-dark" style={{marginLeft: '.5%'}}onClick={goToNextPage}>Next</button>
             </div>
         </div>
     );

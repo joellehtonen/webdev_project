@@ -76,7 +76,7 @@ const UserPage = () => {
 
   return (
     <div className="container text-center">
-      <h1>Liked Pokemon</h1>
+      <h1>Liked Pokémon</h1>
       {likedPokemons.length === 0 ?
 	<p>Nothing liked yet.</p> 
 	: (
