@@ -12,6 +12,8 @@ import PokemonPage from './pokemonPage';
 import UserSettingsPage from './userSettingsPage';
 import './App.css';
 import axios from 'axios';
+import LogoutOnClose from './handleCloseSession';
+import InactivityLogout from './trackInactiveUser';
 //import IsTokenExpired from './handleTokenExpired';
 
 function App() {
@@ -50,8 +52,6 @@ const fetchUserData = async (token) => {
     const data = await response.json(); // Parse JSON directly from response
       setUserName(data.username);
       setUserId(data.id);
-      console.log("Logged in as", data.username); // Logging username
-      console.log("ID is", data.id); // Logging username
   } catch (error) {
     console.error("Failed to fetch username: ", error);
     localStorage.removeItem('auth_token');
@@ -61,13 +61,26 @@ const fetchUserData = async (token) => {
   }
 };
 
-const handleLogout = () => {
+const handleLogout = (reason) => {
   // Clear the login state and token
   localStorage.removeItem('auth_token');
   setIsLoggedIn(false);
   setUserName('');
   navigate('/login'); // Redirect to login after logout
+
+  if (reason === 'inactivity') {
+    navigate('/login', { state: { message: "You have been logged out due to inactivity." } });
+  } else {
+    navigate('/login');
+  }
 };
+
+const handleUserLogout = () => {
+  handleLogout('manual'); // You can pass any string, or none at all
+};
+
+LogoutOnClose(handleLogout)
+InactivityLogout(isLoggedIn, handleLogout, 600000)
 
 // Fetch user data when searching for other users
     useEffect(() => {
@@ -106,7 +119,12 @@ const handleLogout = () => {
         <nav className="navbar bg-dark navbar-expand-lg navbar-fixed-top" data-bs-theme="dark">
           <div className="container align-items-center">
             <div className="navbar-header">
-              <a className="navbar-brand" href="/">Pokémon Finder</a>
+            <a className="navbar-brand" href="/" onClick={(e) => {
+                e.preventDefault(); // Prevent the default anchor behavior
+                navigate('/'); // Programmatically navigate to the home page
+            }}>
+                Pokémon Finder
+            </a>
             </div>
 
             <div id="header">
@@ -147,7 +165,7 @@ const handleLogout = () => {
                     <button className="nav-link text-capitalize" onClick={() => navigate(`/user/${userId}`)}>{userName}'s Home</button>
                   </li>
                   <li className="nav-item">
-                    <button className="nav-link" onClick={handleLogout}>Logout</button>
+                    <button className="nav-link" onClick={handleUserLogout}>Logout</button>
                   </li>
                   <li className="nav-item">
                     <button className="nav-link" onClick={() => navigate(`/user/settings`)}>Settings</button>

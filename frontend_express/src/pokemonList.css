@@ -32,7 +32,6 @@
     z-index: 1000; /* Ensure dropdown appears above other elements */
     max-height: 200px;
     max-width: 200px;
-    left: 200px; 
     overflow-y: auto; /* Add scroll if too many items */
     width: calc(100% - 16px); /* Match input width, accounting for padding */
 }
