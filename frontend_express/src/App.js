@@ -12,7 +12,6 @@ import PokemonPage from './pokemonPage';
 import UserSettingsPage from './userSettingsPage';
 import './App.css';
 import axios from 'axios';
-import LogoutOnClose from './handleCloseSession';
 import InactivityLogout from './trackInactiveUser';
 //import IsTokenExpired from './handleTokenExpired';
 
