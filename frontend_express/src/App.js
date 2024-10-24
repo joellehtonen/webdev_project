@@ -2,10 +2,9 @@
 // src/App.js
 
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom'; // Import Link here
-import PokemonList from './pokemonList'; // Adjust the import path as necessary
-//import RegisterForm from './registerForm';//
-import RegisterPage from './registerPage';//
+import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
+import PokemonList from './pokemonList';
+import RegisterPage from './registerPage';
 import LoginPage from './loginForm';
 import UserPage from './userPage';
 import PokemonPage from './pokemonPage';
@@ -14,19 +13,22 @@ import './App.css';
 import axios from 'axios';
 import LogoutOnClose from './handleCloseSession';
 import InactivityLogout from './trackInactiveUser';
-//import IsTokenExpired from './handleTokenExpired';
 
 function App() {
   const location = useLocation(); // Get the current route
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [userId, setUserId] = useState(null);
-  // const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);   // Pagination state
+  const [searchQuery, setSearchQuery] = useState('');  // Search state
+  const [selectedType, setSelectedType] = useState(null); // Selected type filter
+  const [pokemonList, setPokemonList] = useState([]);  // List of all Pokémon
+  const [filteredList, setFilteredList] = useState([]); // Filtered Pokémon list
 
   useEffect(() => {
     // Check login status in localStorage
@@ -112,7 +114,6 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
       }
   }, [userSearchQuery, users]);
 
-
   return (
     <div>
       <header>
@@ -120,8 +121,8 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
           <div className="container align-items-center">
             <div className="navbar-header">
             <a className="navbar-brand" href="/" onClick={(e) => {
-                e.preventDefault(); // Prevent the default anchor behavior
-                navigate('/'); // Programmatically navigate to the home page
+                e.preventDefault();  // Prevent the default anchor behavior
+                navigate('/');
             }}>
                 Pokémon Finder
             </a>
@@ -144,7 +145,7 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
                     {filteredUsers.map((user) => (
                       <Link
                         key={user.id}
-                        to={`/user/${user.id}`} // Link to user detail page
+                        to={`/user/${user.id}`}
                         className="list-group-item text-capitalize"
                         onClick={() => setUserSearchQuery('')} // Clear the search query on click
                       >

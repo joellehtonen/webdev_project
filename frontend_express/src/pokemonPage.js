@@ -18,7 +18,7 @@ const PokemonPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [pokemonList, setPokemonList] = useState([]);
-    const [currentId, setCurrentId] = useState(null);
+    const { currentPage } = location.state || { currentPage: 1 };
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
@@ -37,7 +37,6 @@ const PokemonPage = () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon?name=${encodeURIComponent(name)}`)
                 setPokemon(response.data);
-                setCurrentId(response.data.id);
                 setPokemonList(location.state?.pokemonList || []);
                 setError(null)
                 if (isLoggedIn && userId) {
@@ -103,10 +102,6 @@ const PokemonPage = () => {
 
     if (error) return <div>Error: {error}</div>;
     if (!pokemon) return <div>Loading...</div>;
-
-    const { currentPage } = location.state || { currentPage: 1 };
-
-    console.log('list length is ', pokemonList.length);
 
     const handleNavigation = (direction) => {
         const currentIndex = pokemonList.findIndex(p => p.name === pokemon.name); // Get current index
@@ -206,7 +201,7 @@ const PokemonPage = () => {
                     Next Pokémon
                      </button>
                 </div>
-                <button className="button" onClick={() => navigate(`/?page=${currentPage}`, { state: { currentPage } })} style={{ marginTop: '5px'}}>
+                <button className="button" onClick={() => navigate(`/?page=${currentPage}`, { state: { currentPage, pokemonList } })} style={{ marginTop: '5px'}}>
                     Back to Pokémon List
                 </button>
             </div>

@@ -34,7 +34,7 @@ const PokemonList = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
-        if (token && token.split('.').length === 3) { // Check if it has 3 parts
+        if (token && token.split('.').length === 3) {
             setAuthToken(token);
             const decodedToken = jwtDecode(token);
             setDecodedToken(decodedToken);
