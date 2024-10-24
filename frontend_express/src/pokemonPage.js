@@ -122,6 +122,10 @@ const PokemonPage = () => {
         }
     };
 
+    const handleTypeClick = (typeName) => {
+        navigate(`/?type=${typeName}`);
+    };
+
     const statColors = {
         hp: '#7AC74C',
         attack: '#F7D02C',
@@ -139,7 +143,13 @@ const PokemonPage = () => {
                 </h1>
                 <div className="types-container">
                     {pokemon.types.map((type) => (
-                        <div key={type.type.name} className={`type-${type.type.name}`} data-type={type.type.name}>
+                        <div
+                            key={type.type.name}
+                            className={`type-${type.type.name}`}
+                            data-type={type.type.name}
+                            onClick={() => handleTypeClick(type.type.name)}
+                            style={{ cursor: 'pointer' }}
+                        >
                             {type.type.name.charAt(0).toUpperCase() + type.type.name.slice(1)}
                         </div>
                     ))}
@@ -154,8 +164,8 @@ const PokemonPage = () => {
                     />
                 </div>
                 <div class="right-side">
-                    <h5 style={{ marginTop: '10%'}}>Height:  {pokemon.height / 10} m</h5>
-                    <h5>Weight:  {pokemon.weight / 10} kg</h5>
+                    <h5 style={{ marginTop: '10%'}}>{pokemon.height / 10} m</h5>
+                    <h5>{pokemon.weight / 10} kg</h5>
                     {pokemon.stats.map((statObject) => {
                         const statName = statObject.stat.name;
                         const statValue = statObject.base_stat;

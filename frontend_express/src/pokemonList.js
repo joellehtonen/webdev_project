@@ -3,7 +3,7 @@ import axios from 'axios';
 import './pokemonList.css';
 import { Link, useLocation, useNavigate} from 'react-router-dom';
 import { jwtDecode } from "jwt-decode"
-import { wait } from '@testing-library/user-event/dist/utils';
+import { isValidInputTimeValue, wait } from '@testing-library/user-event/dist/utils';
 import './App.css'
 
 const PokemonList = () => {
@@ -13,9 +13,6 @@ const PokemonList = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredList, setFilteredList] = useState([]);
     const itemsPerPage = 25;
-    const [users, setUsers] = useState([]);
-    const [userSearchQuery, setUserSearchQuery] = useState('');
-    const [filteredUsers, setFilteredUsers] = useState([]);
     const [showTypeDropdown, setShowTypeDropdown] = useState(false);
     const [types, setTypes] = useState([]);
     const [selectedType, setSelectedType] = useState(null)
@@ -23,6 +20,7 @@ const PokemonList = () => {
     const [sortZA, setSortZA] = useState(false); // Z-A checkbox
     const [typeFilteredList, setTypeFilteredList] = useState([]);
     const location = useLocation();
+    const navigate = useNavigate();
     const { currentPage: initialPage } = location.state || { currentPage: 1 };  // Default to page 1 if no state is passed
     const [currentPage, setCurrentPage] = useState(initialPage);
     const [paginatedList, setPaginatedList] = useState([]);
@@ -30,6 +28,9 @@ const PokemonList = () => {
     const [decodedToken, setDecodedToken] = useState({});
     const [userLikes, setUserLikes] = useState([]);
     const [userId, setUserId] = useState(null);
+    const query = new URLSearchParams(location.search);
+    const type = query.get('type');
+    const page = parseInt(query.get('page')) || 1;
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
@@ -44,7 +45,8 @@ const PokemonList = () => {
         }
     },[])
 
-  useEffect(() => {
+    // Fetch likes
+    useEffect(() => {
         if (userId === null)
             return ;
         const fetchLikes = async () => {
@@ -58,7 +60,7 @@ const PokemonList = () => {
             }
         }
         fetchLikes();
-  }, [userId]);
+    }, [userId]);
 
     const sortPokemons = useCallback((list) => {
         return [...list].sort((a, b) => {
@@ -77,11 +79,13 @@ const PokemonList = () => {
     // Fetch Pokémon data
     useEffect(() => {
         const fetchPokemon = async () => {
+            setLoading(true);
             try {
                 const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon`);
                 setPokemon(response.data.results);
                 setLoading(false);
                 setFilteredList(response.data.results);
+                setLoading(false);
             } catch (err) {
                 setError('Failed to fetch Pokémon');
                 setLoading(false);
@@ -92,6 +96,8 @@ const PokemonList = () => {
 
     // Filter Pokémon based on search query
     useEffect(() => {
+        const filterPokemon = async () => {
+        setLoading(true);
         let filtered = pokemonList;
     
         if (selectedType) {
@@ -110,40 +116,13 @@ const PokemonList = () => {
     
         setFilteredList(filtered);
         setCurrentPage(initialPage);
-        if (searchQuery) {
-            setCurrentPage(1);
-        }
+        setLoading(false);
+        // if (searchQuery) {
+        //     setCurrentPage(1);
+        // };
+    };
+        filterPokemon();
     }, [searchQuery, pokemonList, sortAZ, sortZA, sortPokemons, typeFilteredList, selectedType, initialPage]);
-    
-    // // Fetch users data
-    // useEffect(() => {
-    //     const token = localStorage.getItem('auth_token')
-    //     const fetchUsers = async () => {
-    //         if (token) {
-    //             try {
-    //                 const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users`);
-    //                 setUsers(resp.data);
-    //                 setFilteredUsers(resp.data);
-    //             } catch (err) {
-    //                 setError('Failed to fetch users');
-    //             }
-    //         }
-    //     }
-    //     fetchUsers();
-    // }, []);
-
-    // // Filter users based on search query
-    // useEffect(() => {
-    //     if (userSearchQuery) {
-    //         setFilteredUsers(
-    //             users.filter((user) =>
-    //                 user.username.toLowerCase().includes(userSearchQuery.toLowerCase())
-    //             )
-    //         );
-    //     } else {
-    //         setFilteredUsers([]); // Clear filtered users
-    //     }
-    // }, [userSearchQuery, users]);
 
     // Fetch Pokémon types
     useEffect(() => {
@@ -156,8 +135,9 @@ const PokemonList = () => {
             }
         };
         fetchPokemonTypes();
-    }, []);
+    }, [type]);
 
+    // Fetch paginated Pokémons
     useEffect(() => {
         const paginatedList = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
         const fetchPokeData = async () => {
@@ -177,21 +157,26 @@ const PokemonList = () => {
     }, [filteredList, currentPage]);
 
     const filterByType = async (type) => {
-        setSearchQuery('')
+        // setSearchQuery('')
+        // setLoading(true);
         if (type === 'all') {
             setFilteredList(sortPokemons(pokemonList))
             setTypeFilteredList(pokemonList)
             setSelectedType(null)
             setShowTypeDropdown(false)
             setCurrentPage(1)
+            navigate({
+                pathname: '/',
+                search: ''
+            });
             return;
         }
         try {
             const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon?type=${type}`)
             const pokemonByType = resp.data.pokemon.map(p => ({
-                name: p.pokemon.name,
-                url: p.pokemon.url,
-                types: p.pokemon.types
+                name:   p.pokemon.name,
+                url:    p.pokemon.url,
+                types:  p.pokemon.types
             }))
             const sortedPokemons = sortPokemons(pokemonByType);
             setFilteredList(sortedPokemons)
@@ -199,10 +184,21 @@ const PokemonList = () => {
             setShowTypeDropdown(false)
             setCurrentPage(1)
             setSelectedType(type)
+            navigate({
+                pathname: '/',
+                search: `type=${type}`
+            });
         } catch (err) {
             setError(`Failed to fetch pokemon by type`)
         }
     }   
+
+    // Update page if type is changed
+    useEffect(() => {
+        if (type) {
+            filterByType(type);
+        }
+    }, [type]);
 
     // Update sorting states
     const handleSortAZ = () => {
@@ -215,18 +211,8 @@ const PokemonList = () => {
         if (sortAZ) setSortAZ(false); // Ensure A-Z is off
     };
 
-    if (loading) {
-        return (
-            <div className="alert alert-secondary text-center" role="alert">
-                Loading...
-            </div>
-        );
-    }
-    if (error) return <h2>{error}</h2>;
-
     const totalPages = Math.ceil(filteredList.length / itemsPerPage);
     
-
     const goToNextPage = () => {
         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     };
@@ -257,7 +243,7 @@ const PokemonList = () => {
       })
       setUserLikes(newUserLikes);
     }
-  }
+    }
 
   const likePokemon = async (pokemonId, userId) => {
     try {
@@ -274,7 +260,17 @@ const PokemonList = () => {
     catch (err) {
         console.log(`Error while liking pokemon: ${err}`)
         }
-  }
+    }
+
+    if (loading) {
+    return (
+        <div className="alert alert-secondary text-center" role="alert">
+            Loading...
+        </div>
+    );
+    }
+
+    if (error) return <h2>{error}</h2>;
 
     return (
         <div>
@@ -306,12 +302,9 @@ const PokemonList = () => {
                                 {types.map((type) => (
                                     <div
                                         key={type.name}
-                                        /*to={`/pokemon/type/${type.name}`}*/
                                         className="dropdown-item"
-                                        onClick={() => //{
-                                            //setShowTypeDropdown(false); // Hide dropdown after selection
-                                            filterByType(type.name)
-                                        }//}
+                                        onClick={() => filterByType(type.name)
+                                        }
                                     >
                                         {type.name.charAt(0).toUpperCase() + type.name.slice(1)} {/* Capitalize first letter */}
                                     </div>
@@ -374,9 +367,9 @@ const PokemonList = () => {
                 </ul>
             </div>
             <div className="pagination">
-                <button className="button" style={{marginRight: '.5%'}} onClick={goToPreviousPage}>Previous</button>
+                <button className="btn btn-outline-dark" style={{marginRight: '.5%'}} onClick={goToPreviousPage}>Previous</button>
                 <span style={{marginTop: '.5%'}}>{`Page ${currentPage} of ${totalPages}`}</span>
-                <button className="button"style={{marginLeft: '.5%'}}onClick={goToNextPage}>Next</button>
+                <button className="btn btn-outline-dark" style={{marginLeft: '.5%'}}onClick={goToNextPage}>Next</button>
             </div>
         </div>
     );
