@@ -11,7 +11,6 @@ import PokemonPage from './pokemonPage';
 import UserSettingsPage from './userSettingsPage';
 import './App.css';
 import axios from 'axios';
-import LogoutOnClose from './handleCloseSession';
 import InactivityLogout from './trackInactiveUser';
 
 function App() {
@@ -30,19 +29,33 @@ function App() {
   const [pokemonList, setPokemonList] = useState([]);  // List of all Pokémon
   const [filteredList, setFilteredList] = useState([]); // Filtered Pokémon list
 
+  const validateToken = async (token) => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/validate`, {}, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.status === 200) {
+        setIsLoggedIn(true);
+        fetchUserData(token);
+      }
+    } catch (error) {
+      console.error('Token is invalid or expired:', error);
+      handleLogout('close');
+    }
+  };
+
   useEffect(() => {
-    // Check login status in localStorage
-    const token = localStorage.getItem('auth_token'); // Check for token presence instead of 'isLoggedIn'
-    if (token/* && !IsTokenExpired(token)*/) {
-      setIsLoggedIn(!!token); // Set isLoggedIn based on token presence
-      fetchUserData(token);
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      validateToken(token);
     } else {
       localStorage.removeItem('auth_token');
       setIsLoggedIn(false);
       setUserName('');
       setUserId(null);
     }
-}, [location, userName]); // Re-run effect when location (route) changes
+  }, [location, userName]);
 
 // fetch your user data when logging in
 const fetchUserData = async (token) => {
@@ -72,8 +85,10 @@ const handleLogout = (reason) => {
 
   if (reason === 'inactivity') {
     navigate('/login', { state: { message: "You have been logged out due to inactivity." } });
-  } else {
+  } else if (reason === 'manual') {
     navigate('/login');
+  } else {
+    navigate ('/')
   }
 };
 
@@ -81,7 +96,6 @@ const handleUserLogout = () => {
   handleLogout('manual'); // You can pass any string, or none at all
 };
 
-LogoutOnClose(handleLogout)
 InactivityLogout(isLoggedIn, handleLogout, 600000)
 
 // Fetch user data when searching for other users
@@ -90,16 +104,18 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
       const fetchUsersSearch = async () => {
           if (token) {
               try {
-                  const resp = await axios.get('${process.env.REACT_APP_BACKEND_URL}/users');
+                  const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users`);
                   setUsers(resp.data);
                   setFilteredUsers(resp.data);
               } catch (err) {
                   setError('Failed to fetch users');
               }
+          console.log("token is: ")
+          console.log(token)
           }
       }
       fetchUsersSearch();
-  }, []);
+  }, [isLoggedIn]);
 
   // Filter users based on search query
   useEffect(() => {

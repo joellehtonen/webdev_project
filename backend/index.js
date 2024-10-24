@@ -48,7 +48,6 @@ app.get('/users/:id', async (req, res) => {
 
 // Get username by authtoken
 app.get('/get_user_by_token', authMiddleware, async (req, res) => {
-	console.log(req.user.id);
 	const userId = req.user.id;
 	try {
 		const result = await pool.query('SELECT id, username FROM users where id = $1', [userId]);
