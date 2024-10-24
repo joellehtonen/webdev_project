@@ -39,7 +39,6 @@ const PokemonList = () => {
             setDecodedToken(decodedToken);
             setUserId(decodedToken.id);
         } else {
-            console.error("Invalid token format:", token);
             setAuthToken("");
             setDecodedToken({});
         }

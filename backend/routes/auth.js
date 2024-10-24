@@ -64,13 +64,17 @@ router.post('/login', async (req, res) => {
 		if (await bcrypt.compare(password, result.rows[0].hashed_password) === false) {
 			return res.status(400).json({ error: 'Invalid credentials' })
 		}
-		const token = jwt.sign({ id: result.rows[0].id}, JWT_SECRET, { expiresIn: '1h' })
+		const token = jwt.sign({ id: result.rows[0].id}, JWT_SECRET, { expiresIn: '24h' })
 		res.json({ auth_token: token });
 	}
 	catch (err) {
 		console.error(err);
 		res.status(500).json({ error: 'Internal server error' });
 	}
+})
+
+router.post('/validate', authMiddleware, async (req, res) => {
+	res.status(200).json({msg: 'Token validated'})
 })
 
 router.put(`/updateCredentials`, authMiddleware, async (req, res) => {
