@@ -12,7 +12,7 @@ const PokemonList = () => {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredList, setFilteredList] = useState([]);
-    const itemsPerPage = 25;
+    const itemsPerPage = 28;
     const [showTypeDropdown, setShowTypeDropdown] = useState(false);
     const [types, setTypes] = useState([]);
     const [selectedType, setSelectedType] = useState(null)
@@ -335,11 +335,11 @@ const PokemonList = () => {
                 </div>
             </div>
             <div className="container-xl text-center">
-                <ul className="d-flex flex-wrap ">
+                <ul className="d-flex flex-wrap">
                     { paginatedList.map((p) => (
-                        <li className="list-group-item p-3">
-                            <div className="container vstack border border-secondary rounded">
-                                <h3 className="text text-capitalize mt-3">{p.name}</h3>
+                        <li className="list-group-item p-3" >
+                            <div className="container vstack border border-secondary rounded" >
+                                <h3 className="text text-capitalize mt-3 mb-0" style={{"height": "2em", "width": "8em"}}>{p.name}</h3>
                                 <Link className="text text-capitalize" 
                                 to={`/pokemon/${p.name}`}
                                 state={{ currentPage, pokemonList: filteredList }}>

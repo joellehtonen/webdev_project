@@ -85,7 +85,7 @@ const UserPage = () => {
 	      p.pokemonData !== 'Unknown' &&
 		<li className="list-group-item p-3">
 		  <div className="container vstack border border-secondary rounded">
-		  <h3 className="text text-capitalize mt-3">{p.pokemonData.name}</h3>
+		  <h3 className="text text-capitalize my-3" style={{"height": "2em", "width": "8em"}}>{p.pokemonData.name}</h3>
 		  <Link className="text text-capitalize" to={`/pokemon/${p.pokemonData.name}`}>
 		  <img src={p.pokemonData.sprites.other['official-artwork'].front_default}
 		    alt={`Picture of ${p.pokemonData.name}`}
