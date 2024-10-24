@@ -36,7 +36,6 @@ const authMiddleware = (req, res, next) => {
 }
 
 router.post('/register', async (req, res) => {
-	console.log(req.body);
 	const { username, password } = req.body;
 	try {
 		const count_result = await pool.query('SELECT username FROM users WHERE username = ($1)', [username]);
