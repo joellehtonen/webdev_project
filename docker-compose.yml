@@ -1,0 +1,28 @@
+services:
+  # Express backend
+  backend:
+    build: backend/
+    container_name: backend
+    environment:
+      - DATABASE_URL=db
+    ports:
+      - 5000:5000
+
+  # Postgres database
+  db:
+    build: db/
+    container_name: db
+    restart: always
+    user: postgres
+    ports:
+      - 5432:5432
+  
+  # React frontend
+  frontend:
+    build: frontend_express/
+    container_name: frontend
+    restart: always
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:5000
+    ports:
+      - 3000:3000

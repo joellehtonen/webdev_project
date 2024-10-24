@@ -52,7 +52,7 @@ const PokemonList = () => {
             return ;
         const fetchLikes = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/likes/user/${userId}`)
+                const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/likes/user/${userId}`)
                 const likes = response.data;
                 setUserLikes(likes);
             }
@@ -82,7 +82,7 @@ const PokemonList = () => {
         const fetchPokemon = async () => {
             setLoading(true);
             try {
-                const response = await axios.get('http://localhost:5000/pokemon');
+                const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon`);
                 setPokemon(response.data.results);
                 setLoading(false);
                 setFilteredList(response.data.results);
@@ -129,7 +129,7 @@ const PokemonList = () => {
     useEffect(() => {
         const fetchPokemonTypes = async () => {
             try {
-                const resp = await axios.get('http://localhost:5000/pokemon/type');
+                const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon/type`);
                 setTypes(resp.data); // Expecting an array of types
             } catch (err) {
                 setError('Failed to fetch types');
@@ -144,7 +144,7 @@ const PokemonList = () => {
         const fetchPokeData = async () => {
             const paginatedListWithData = await Promise.all(paginatedList.map(async (pl) => {
                 try {
-                    const res = await axios.get(`http://localhost:5000/pokemon/${pl.name}`);
+                    const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon/${pl.name}`);
                     return { ...res.data};
                 }
                 catch(err) {
@@ -173,7 +173,7 @@ const PokemonList = () => {
             return;
         }
         try {
-            const resp = await axios.get(`http://localhost:5000/pokemon?type=${type}`)
+            const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon?type=${type}`)
             const pokemonByType = resp.data.pokemon.map(p => ({
                 name:   p.pokemon.name,
                 url:    p.pokemon.url,
@@ -230,11 +230,11 @@ const PokemonList = () => {
 
   const unlikePokemon = async (pokemonId, userId) => {
 
-    const likesResponse = await axios.get(`http://localhost:5000/likes/user/${userId}`);
+    const likesResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/likes/user/${userId}`);
     const userLikes = likesResponse.data;
     const likeToDelete = userLikes.find(like => like.pokemon_id === pokemonId);
     if (likeToDelete) {
-	await axios.delete(`http://localhost:5000/likes/delete/${likeToDelete.id}`, {
+	await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/likes/delete/${likeToDelete.id}`, {
 	    headers: {
 		'Authorization': `Bearer ${authToken}`
 	    },
@@ -248,7 +248,7 @@ const PokemonList = () => {
 
   const likePokemon = async (pokemonId, userId) => {
     try {
-        const res = await axios.post(`http://localhost:5000/likes/add`,
+        const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/likes/add`,
             { pokemon_id: pokemonId }, 
             { headers:  
                 { 'Authorization': `Bearer ${authToken}`,

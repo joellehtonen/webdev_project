@@ -45,7 +45,7 @@ const UserSettingsPage = () => {
                 return;
             }
 
-            const response = await axios.put(`http://localhost:5000/auth/updateCredentials`,
+            const response = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/auth/updateCredentials`,
                 {
                     currentPassword,
                     newUsername: newUsername || undefined,
