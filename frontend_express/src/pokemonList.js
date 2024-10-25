@@ -32,13 +32,29 @@ const PokemonList = () => {
     const type = query.get('type');
     const page = parseInt(query.get('page')) || 1;
 
-    useEffect(() => {
-        const token = localStorage.getItem('auth_token');
-        if (token && token.split('.').length === 3) { // Check if it has 3 parts
+    const validateToken = async (token) => {
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/validate`, {}, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+    
+          if (response.status === 200) {
             setAuthToken(token);
             const decodedToken = jwtDecode(token);
             setDecodedToken(decodedToken);
             setUserId(decodedToken.id);
+          }
+        } catch (error) {
+          console.error('Token is invalid or expired:', error);
+          localStorage.removeItem('auth_token');
+          navigate('/login')
+        }
+      };
+
+    useEffect(() => {
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+            validateToken(token)
         } else {
             setAuthToken("");
             setDecodedToken({});
@@ -337,7 +353,7 @@ const PokemonList = () => {
             <div className="container-xl text-center">
                 <ul className="d-flex flex-wrap">
                     { paginatedList.map((p) => (
-                        <li className="list-group-item p-3" >
+                        <li key={p.id} className="list-group-item p-3" >
                             <div className="container vstack border border-secondary rounded" >
                                 <h3 className="text text-capitalize mt-3 mb-0" style={{"height": "2em", "width": "8em"}}>{p.name}</h3>
                                 <Link className="text text-capitalize" 

@@ -20,14 +20,30 @@ const PokemonPage = () => {
     const [pokemonList, setPokemonList] = useState([]);
     const [currentId, setCurrentId] = useState(null);
 
-    useEffect(() => {
-        const token = localStorage.getItem('auth_token');
-        if (token && token.split('.').length === 3) { // Check if it has 3 parts
+    const validateToken = async (token) => {
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/validate`, {}, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+    
+          if (response.status === 200) {
             setIsLoggedIn(true);
             const decodedToken = jwtDecode(token);
             setUserId(decodedToken.id);
+          }
+        } catch (error) {
+          console.error('Token is invalid or expired:', error);
+          setIsLoggedIn(false)
+          localStorage.removeItem('auth_token');
+          navigate('/login')
+        }
+      };
+
+    useEffect(() => {
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+            validateToken(token)
         } else {
-            console.error("Invalid token format:", token);
             setIsLoggedIn(false);
         }
     }, []);
@@ -106,8 +122,6 @@ const PokemonPage = () => {
 
     const { currentPage } = location.state || { currentPage: 1 };
 
-    console.log('list length is ', pokemonList.length);
-
     const handleNavigation = (direction) => {
         const currentIndex = pokemonList.findIndex(p => p.name === pokemon.name); // Get current index
         let nextIndex = currentIndex;
@@ -137,7 +151,7 @@ const PokemonPage = () => {
 
     return (
         <div>
-            <div class="flex-container">
+            <div className="flex-container">
                 <h1 className="text-4xl font-bold pt-4">
                     {name.charAt(0).toUpperCase() + name.slice(1)}
                 </h1>
@@ -154,8 +168,8 @@ const PokemonPage = () => {
                         </div>
                     ))}
                 </div>
-                <div class="bottom">
-                <div class="left-side">
+                <div className="bottom">
+                <div className="left-side">
                     <img
                         src={pokemon.sprites.other['official-artwork'].front_default}
                         alt={pokemon.name}
@@ -163,7 +177,7 @@ const PokemonPage = () => {
                         height={400}
                     />
                 </div>
-                <div class="right-side">
+                <div className="right-side">
                     <h5 style={{ marginTop: '10%'}}>{pokemon.height / 10} m</h5>
                     <h5>{pokemon.weight / 10} kg</h5>
                     {pokemon.stats.map((statObject) => {
@@ -190,12 +204,14 @@ const PokemonPage = () => {
                     })}
                 </div>
                 </div>
+                {isLoggedIn && (
                 <button type="button" 
                         onClick={handleLike}
                         className={liked ? 'btn btn-outline-danger btn-sm mb-3 mt-3' : 'btn btn-outline-success btn-sm mb-3 mt-3'}
                         style={{width: '100px', marginLeft: '0px', marginTop: '20px'}}>
                         {liked ? 'Unlike' : 'Like'}
                 </button>
+                )}
                 <div>
                     <label style={{ marginRight: '5px', marginTop: '10%'}}>
                         <button className="button" onClick={() => handleNavigation('prev')} disabled={pokemonList.length <= 1}>

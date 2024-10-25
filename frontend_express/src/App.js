@@ -79,7 +79,6 @@ const handleLogout = (reason) => {
   localStorage.removeItem('auth_token');
   setIsLoggedIn(false);
   setUserName('');
-  navigate('/login'); // Redirect to login after logout
 
   if (reason === 'inactivity') {
     navigate('/login', { state: { message: "You have been logged out due to inactivity." } });
@@ -108,8 +107,6 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
               } catch (err) {
                   setError('Failed to fetch users');
               }
-          console.log("token is: ")
-          console.log(token)
           }
       }
       fetchUsersSearch();
