@@ -19,7 +19,7 @@ services:
   
   # React frontend
   frontend:
-    build: frontend_express/
+    build: frontend/
     container_name: frontend
     restart: always
     environment:
