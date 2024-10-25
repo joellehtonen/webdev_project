@@ -1,65 +1,65 @@
 /* src/PokemonList.css */
 .pokemon-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Four columns */
-    gap: 20px; /* Space between items */
-    padding: 50px; /* Padding around the grid */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Four columns */
+  gap: 20px; /* Space between items */
+  padding: 50px; /* Padding around the grid */
 }
 
 .pokemon-card {
-    background-color: #f9f9f9; /* Light background color */
-    border: 1px solid #ddd; /* Border color */
-    border-radius: 8px; /* Rounded corners */
-    padding: 5px; /* Padding inside the card */
-    text-align: center; /* Centered text */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    transition: transform 0.2s; /* Animation for hover effect */
-    /*min-height: 100px; /* Set a minimum height for cards */
-    display: flex; /* Use flexbox to align content */
-    flex-direction: column; /* Stack content vertically */
-    justify-content: center; /* Center content vertically */
+  background-color: #f9f9f9; /* Light background color */
+  border: 1px solid #ddd; /* Border color */
+  border-radius: 8px; /* Rounded corners */
+  padding: 5px; /* Padding inside the card */
+  text-align: center; /* Centered text */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: transform 0.2s; /* Animation for hover effect */
+  /*min-height: 100px; /* Set a minimum height for cards */
+  display: flex; /* Use flexbox to align content */
+  flex-direction: column; /* Stack content vertically */
+  justify-content: center; /* Center content vertically */
 }
 
 .pokemon-card:hover {
-    transform: scale(1.05); /* Scale up the card slightly on hover */
+  transform: scale(1.05); /* Scale up the card slightly on hover */
 }
 
 .dropdown-list {
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    z-index: 1000; /* Ensure dropdown appears above other elements */
-    max-height: 200px;
-    max-width: 200px;
-    overflow-y: auto; /* Add scroll if too many items */
-    width: calc(100% - 16px); /* Match input width, accounting for padding */
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  z-index: 1000; /* Ensure dropdown appears above other elements */
+  max-height: 200px;
+  max-width: 200px;
+  overflow-y: auto; /* Add scroll if too many items */
+  width: calc(100% - 16px); /* Match input width, accounting for padding */
 }
 
 .dropdown-right {
-    margin-left: 1200px; 
-    margin-top: -20px;
- }
+  margin-left: 1200px;
+  margin-top: -20px;
+}
 
 .input-right {
-   margin-left: 1050px; 
-   max-width: 600px;
+  margin-left: 1050px;
+  max-width: 600px;
 }
 
 .dropdown-item {
-    padding: 8px 12px;
-    cursor: pointer;
-    text-decoration: none; /* Remove underline */
-    color: black; /* Link color */
+  padding: 8px 12px;
+  cursor: pointer;
+  text-decoration: none; /* Remove underline */
+  color: black; /* Link color */
 }
 
 .dropdown-item:hover {
-    background-color: #f0f0f0; /* Highlight on hover */
+  background-color: #f0f0f0; /* Highlight on hover */
 }
 
 .pagination {
-    display: flex; /* Flex layout for pagination */
-    justify-content: center; /* Center the buttons */
-    margin-top: 20px; /* Space above pagination */
-    padding-bottom: 100px; /* Space below pagination to footer */
+  display: flex; /* Flex layout for pagination */
+  justify-content: center; /* Center the buttons */
+  margin-top: 20px; /* Space above pagination */
+  padding-bottom: 100px; /* Space below pagination to footer */
 }
