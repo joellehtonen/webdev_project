@@ -350,17 +350,21 @@ const PokemonList = () => {
                                     />
 
                                 </Link> 
-                                { isLikedPokemon(p.id) ?
-                                    <button 
-                                        className="btn btn-outline-danger btn-sm mb-3 mt-3"
-                                        onClick={() => unlikePokemon(p.id, userId)}>
-                                        Unlike</button>
-                                    :
-                                    <button 
-                                        className="btn btn-outline-success btn-sm mb-3 mt-3"
-                                        onClick={() => likePokemon(p.id, userId)}>
-                                        Like</button>
-                                }
+                                { authToken && authToken.length > 0 ? ( // Check if the token exists and has length
+                                    isLikedPokemon(p.id) ? (
+                                        <button 
+                                            className="btn btn-outline-danger btn-sm mb-3 mt-3"
+                                            onClick={() => unlikePokemon(p.id, userId)}>
+                                            Unlike
+                                        </button>
+                                    ) : (
+                                        <button 
+                                            className="btn btn-outline-success btn-sm mb-3 mt-3"
+                                            onClick={() => likePokemon(p.id, userId)}>
+                                            Like
+                                        </button>
+                                    )
+                                ) : null }
                             </div>
                         </li>
                     )) }

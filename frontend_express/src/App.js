@@ -215,7 +215,7 @@ InactivityLogout(isLoggedIn, handleLogout, 600000)
         </Routes>
       </main>
 
-      <footer className="footer" style={{ osition: 'relative', bottom: 0, width: '100%', backgroundColor: '#343a40', color: 'white', textAlign: 'center', padding: '20px' }}>
+      <footer className="footer" style={{ position: 'fixed', bottom: 0, width: '100%', backgroundColor: '#343a40', color: 'white', textAlign: 'center', padding: '20px' }}>
         <p>&copy; 2024 Pokémon Finder. All rights reserved.</p>
       </footer>
     </div>
