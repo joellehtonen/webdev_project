@@ -106,8 +106,7 @@ const PokemonPage = () => {
             },
           );
           setLiked(false);
-          setTimeout(() => {
-          }, 2000);
+          setTimeout(() => {}, 2000);
         }
       } else {
         // Like the Pokémon
@@ -124,8 +123,7 @@ const PokemonPage = () => {
           },
         );
         setLiked(true);
-        setTimeout(() => {
-        }, 2000);
+        setTimeout(() => {}, 2000);
       }
     } catch (error) {
       console.error("Error handling like/unlike:", error);
