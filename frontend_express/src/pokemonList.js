@@ -119,6 +119,7 @@ const PokemonList = () => {
             filtered = typeFilteredList;
         }
         if (searchQuery) {
+            setCurrentPage(1)
             filtered = filtered.filter(pokemon =>
                 pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
@@ -126,8 +127,10 @@ const PokemonList = () => {
         if (sortAZ || sortZA) {
             filtered = sortPokemons(filtered);
         }
+        if (!searchQuery) {
+            setCurrentPage(initialPage);
+        }
         setFilteredList(filtered);
-        setCurrentPage(initialPage);
         setLoading(false);
     };
         filterPokemon();
