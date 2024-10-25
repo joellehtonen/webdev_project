@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import PokemonList from "./pokemonList";
 import "./pokemonPage.css";
 import "./App.css";
 
@@ -13,8 +12,6 @@ const PokemonPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userId, setUserId] = useState(null);
   const [liked, setLiked] = useState(false);
-  const [likeMessage, setLikeMessage] = useState("");
-  const [unlikeMessage, setUnlikeMessage] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const [pokemonList, setPokemonList] = useState([]);
@@ -109,9 +106,7 @@ const PokemonPage = () => {
             },
           );
           setLiked(false);
-          setUnlikeMessage(`Unliked Pokémon : ${pokemon.name}`);
           setTimeout(() => {
-            setUnlikeMessage("");
           }, 2000);
         }
       } else {
@@ -129,9 +124,7 @@ const PokemonPage = () => {
           },
         );
         setLiked(true);
-        setLikeMessage(`Liked Pokémon : ${pokemon.name}`);
         setTimeout(() => {
-          setLikeMessage("");
         }, 2000);
       }
     } catch (error) {

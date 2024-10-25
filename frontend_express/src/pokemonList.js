@@ -3,10 +3,6 @@ import axios from "axios";
 import "./pokemonList.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import {
-  isValidInputTimeValue,
-  wait,
-} from "@testing-library/user-event/dist/utils";
 import "./App.css";
 
 const PokemonList = () => {
@@ -28,12 +24,10 @@ const PokemonList = () => {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [paginatedList, setPaginatedList] = useState([]);
   const [authToken, setAuthToken] = useState("");
-  const [decodedToken, setDecodedToken] = useState({});
   const [userLikes, setUserLikes] = useState([]);
   const [userId, setUserId] = useState(null);
   const query = new URLSearchParams(location.search);
   const type = query.get("type");
-  const page = parseInt(query.get("page")) || 1;
 
   const validateToken = async (token) => {
     try {
@@ -48,7 +42,6 @@ const PokemonList = () => {
       if (response.status === 200) {
         setAuthToken(token);
         const decodedToken = jwtDecode(token);
-        setDecodedToken(decodedToken);
         setUserId(decodedToken.id);
       }
     } catch (error) {
@@ -64,7 +57,6 @@ const PokemonList = () => {
       validateToken(token);
     } else {
       setAuthToken("");
-      setDecodedToken({});
     }
   }, []);
 

@@ -28,12 +28,6 @@ function App() {
   const [userSearchQuery, setUserSearchQuery] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [users, setUsers] = useState([]);
-  const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1); // Pagination state
-  const [searchQuery, setSearchQuery] = useState(""); // Search state
-  const [selectedType, setSelectedType] = useState(null); // Selected type filter
-  const [pokemonList, setPokemonList] = useState([]); // List of all Pokémon
-  const [filteredList, setFilteredList] = useState([]); // Filtered Pokémon list
 
   const validateToken = async (token) => {
     try {
@@ -124,7 +118,7 @@ function App() {
           setUsers(resp.data);
           setFilteredUsers(resp.data);
         } catch (err) {
-          setError("Failed to fetch users");
+          console.log(err);
         }
       }
     };
