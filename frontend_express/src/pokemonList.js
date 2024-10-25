@@ -94,13 +94,13 @@ const PokemonList = () => {
 
     // Fetch Pokémon data
     useEffect(() => {
-        const fetchPokemon = async () => {
+        const fetchPokemon = async (type = '') => {
             setLoading(true);
             try {
                 const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon`);
                 setPokemon(response.data.results);
-                setLoading(false);
-                setFilteredList(response.data.results);
+                const responseType = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon/type`);
+                setTypes(responseType.data);
                 setLoading(false);
             } catch (err) {
                 setError('Failed to fetch Pokémon');
@@ -108,50 +108,30 @@ const PokemonList = () => {
             }
         };
         fetchPokemon();
-    }, []);
+    }, [location.search]);
 
     // Filter Pokémon based on search query
     useEffect(() => {
         const filterPokemon = async () => {
         setLoading(true);
         let filtered = pokemonList;
-    
         if (selectedType) {
             filtered = typeFilteredList;
         }
-    
         if (searchQuery) {
             filtered = filtered.filter(pokemon =>
                 pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
-    
         if (sortAZ || sortZA) {
             filtered = sortPokemons(filtered);
         }
-    
         setFilteredList(filtered);
         setCurrentPage(initialPage);
         setLoading(false);
-        // if (searchQuery) {
-        //     setCurrentPage(1);
-        // };
     };
         filterPokemon();
     }, [searchQuery, pokemonList, sortAZ, sortZA, sortPokemons, typeFilteredList, selectedType, initialPage]);
-
-    // Fetch Pokémon types
-    useEffect(() => {
-        const fetchPokemonTypes = async () => {
-            try {
-                const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/pokemon/type`);
-                setTypes(resp.data); // Expecting an array of types
-            } catch (err) {
-                setError('Failed to fetch types');
-            }
-        };
-        fetchPokemonTypes();
-    }, [type]);
 
     // Fetch paginated Pokémons
     useEffect(() => {
@@ -173,8 +153,6 @@ const PokemonList = () => {
     }, [filteredList, currentPage]);
 
     const filterByType = async (type) => {
-        // setSearchQuery('')
-        // setLoading(true);
         if (type === 'all') {
             setFilteredList(sortPokemons(pokemonList))
             setTypeFilteredList(pokemonList)
@@ -359,14 +337,14 @@ const PokemonList = () => {
                                 <Link className="text text-capitalize" 
                                 to={`/pokemon/${p.name}`}
                                 state={{ currentPage, pokemonList: filteredList }}>
-                                    <img src={p.sprites.other['official-artwork'].front_default}
-                                        alt={`Picture of ${p.name}`}
-                                        width={200}
-                                        height={200}
-                                    />
-
+                                <img 
+                                    src={p.sprites.other['official-artwork'].front_default} 
+                                    alt={p.name} 
+                                    width={200} 
+                                    height={200} 
+                                />
                                 </Link> 
-                                { authToken && authToken.length > 0 ? ( // Check if the token exists and has length
+                                { authToken && authToken.length > 0 ? (
                                     isLikedPokemon(p.id) ? (
                                         <button 
                                             className="btn btn-outline-danger btn-sm mb-3 mt-3"
